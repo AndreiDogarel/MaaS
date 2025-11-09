@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Vehicle } from './vehicle.model';
 import { Observable } from 'rxjs';
@@ -11,5 +11,18 @@ export class VehicleService {
 
   getAllVehicles(): Observable<Vehicle[]> {
     return this.http.get<Vehicle[]>(`${this.base}/all`);
+  }
+
+  searchVehicles(params: { [key: string]: any }): Observable<Vehicle[]> {
+    let httpParams = new HttpParams();
+
+    for (const key in params) {
+      const value = params[key];
+      if (value !== null && value !== undefined && value !== '') {
+        httpParams = httpParams.append(key, value);
+      }
+    }
+
+    return this.http.get<Vehicle[]>(`${this.base}/search`, { params: httpParams });
   }
 }

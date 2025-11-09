@@ -1,4 +1,40 @@
-<h2>🚗 Available Vehicles</h2>
+<h2>🚗 Vehicle Search</h2>
+
+<form (ngSubmit)="executeSearch()">
+  <div>
+    <label for="brand">Brand:</label>
+    <input id="brand" [(ngModel)]="search.brand" name="brand">
+  </div>
+  
+  <div>
+    <label for="model">Model:</label>
+    <input id="model" [(ngModel)]="search.model" name="model">
+  </div>
+
+  <div>
+    <label for="category">License Category (e.g., B):</label>
+    <input id="category" [(ngModel)]="search.licenseCategory" name="licenseCategory">
+  </div>
+  
+  <div>
+    <label for="status">Status:</label>
+    <input id="status" [(ngModel)]="search.status" name="status">
+  </div>
+
+  <div>
+    <label for="year">Min. Year:</label>
+    <input id="year" type="number" [(ngModel)]="search.year" name="year">
+  </div>
+  
+  <div>
+    <button type="submit">🔍 Search</button>
+    <button type="button" (click)="resetSearch()">🔄 Reset</button>
+  </div>
+</form>
+
+<hr>
+
+<h2>Vehicle List</h2>
 
 <div *ngIf="isLoading" class="loading-message">
   Loading vehicles...
