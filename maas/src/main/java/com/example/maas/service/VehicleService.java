@@ -3,6 +3,7 @@ package com.example.maas.service;
 import com.example.maas.entities.CreateVehicleRequest;
 import com.example.maas.entities.Vehicle;
 import com.example.maas.entities.VehicleDto;
+import com.example.maas.entities.VehicleSearchDto;
 import com.example.maas.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -56,5 +57,43 @@ public class VehicleService {
         } catch (DataIntegrityViolationException e) {
             throw new IllegalArgumentException("duplicate registrationNumber");
         }
+    }
+
+    public List<VehicleDto> searchVehicles(VehicleSearchDto searchParams) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM vehicles WHERE 1=1");
+        List<Object> args = new java.util.ArrayList<>();
+
+        // Add brand filter
+        if (searchParams.getBrand() != null && !searchParams.getBrand().isBlank()) {
+            sql.append(" AND brand ILIKE ?"); // ILIKE for case-insensitive search in PostgreSQL
+            args.add("%" + searchParams.getBrand() + "%");
+        }
+
+        // Add model filter
+        if (searchParams.getModel() != null && !searchParams.getModel().isBlank()) {
+            sql.append(" AND model ILIKE ?");
+            args.add("%" + searchParams.getModel() + "%");
+        }
+
+        // Add license category filter
+        if (searchParams.getLicenseCategory() != null && !searchParams.getLicenseCategory().isBlank()) {
+            sql.append(" AND license_category = ?");
+            args.add(searchParams.getLicenseCategory());
+        }
+
+        // Add status filter
+        if (searchParams.getStatus() != null && !searchParams.getStatus().isBlank()) {
+            sql.append(" AND status = ?");
+            args.add(searchParams.getStatus());
+        }
+
+        // Add year filter (e.g., year greater than or equal to)
+        if (searchParams.getYear() != null) {
+            sql.append(" AND year >= ?");
+            args.add(searchParams.getYear());
+        }
+
+        // Execute the query using the dynamic SQL string and arguments
+        return jdbcTemplate.query(sql.toString(), args.toArray(), vehicleRowMapper);
     }
 }

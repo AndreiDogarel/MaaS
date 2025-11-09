@@ -3,6 +3,7 @@ package com.example.maas.controller;
 import com.example.maas.entities.CreateVehicleRequest;
 import com.example.maas.entities.Vehicle;
 import com.example.maas.entities.VehicleDto;
+import com.example.maas.entities.VehicleSearchDto;
 import com.example.maas.service.VehicleService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,28 @@ public class VehicleController {
     @GetMapping("/all")
     public List<VehicleDto> getAllVehicles() {
         return service.getAllVehicles();
+    }
+
+    @GetMapping("/search")
+    public List<VehicleDto> searchVehicles(
+            @RequestParam(required = false) String registrationNumber,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String model,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Long mileage,
+            @RequestParam(required = false) String licenseCategory,
+            @RequestParam(required = false) String status
+    ) {
+        VehicleSearchDto searchParams = new VehicleSearchDto(
+                registrationNumber,
+                brand,
+                model,
+                year,
+                mileage,
+                licenseCategory,
+                status
+        );
+        return service.searchVehicles(searchParams);
     }
 
     @PostMapping
