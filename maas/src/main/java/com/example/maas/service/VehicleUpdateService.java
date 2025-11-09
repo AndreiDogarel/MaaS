@@ -18,20 +18,18 @@ public class VehicleUpdateService {
     // TODO: Fix vehicles database once it exists
     private final RowMapper<VehicleDto> vehicleRowMapper = (rs, rowNum) -> {
         VehicleDto vehicle = new VehicleDto();
-        vehicle.setId(rs.getObject("id", Long.class));
+        vehicle.setRegistrationNumber(rs.getObject("registration_number", String.class));
+        vehicle.setBrand(rs.getObject("brand", String.class));
+        vehicle.setModel(rs.getObject("model", String.class));
+        vehicle.setYear(rs.getObject("year", Integer.class));
         vehicle.setMileage(rs.getObject("mileage", Long.class));
-        vehicle.setStatus(rs.getString("status"));
         vehicle.setLicenseCategory(rs.getString("license_category"));
+        vehicle.setStatus(rs.getString("status"));
         return vehicle;
     };
 
-    public List<VehicleDto> getAllVehicles() {
-        String sql = "SELECT * FROM vehicles";
-        return jdbcTemplate.query(sql, vehicleRowMapper);
-    }
-
     public VehicleDto getVehicleById(Long id) {
-        String sql = "SELECT id, mileage, status, license_category FROM vehicles WHERE id = ?";
+        String sql = "SELECT registration_number, brand, model, mileage, status, license_category FROM vehicles WHERE id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, vehicleRowMapper, id);
         } catch (EmptyResultDataAccessException e) {

@@ -18,12 +18,6 @@ public class VehicleUpdateController {
     @Autowired
     private VehicleUpdateService vehicleUpdateService;
 
-    @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')") // Maybe remove admin restriction later
-    public List<VehicleDto> getAllVehicles() {
-        return vehicleUpdateService.getAllVehicles();
-    }
-
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')") // Maybe remove admin restriction later
     public ResponseEntity<VehicleDto> getVehicleById(@PathVariable Long id) {
