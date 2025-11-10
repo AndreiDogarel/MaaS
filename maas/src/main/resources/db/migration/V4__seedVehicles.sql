@@ -15,7 +15,8 @@ INSERT INTO VEHICLES (
     2023,
     1500,
     'B',
-    'AVAILABLE'
+    'AVAILABLE',
+    95.00
 ),
 (
     'TRE-1111',
@@ -24,7 +25,8 @@ INSERT INTO VEHICLES (
     2024,
     500,
     'B',
-    'AVAILABLE'
+    'AVAILABLE',
+    100.00
 ),
 (
     'QWE-2023',
@@ -33,7 +35,8 @@ INSERT INTO VEHICLES (
     2022,
     35000,
     'C',
-    'MAINTENANCE'
+    'MAINTENANCE',
+    150.00
 ),
 (
     'FGH-5555',
@@ -42,7 +45,8 @@ INSERT INTO VEHICLES (
     2021,
     22000,
     'B',
-    'AVAILABLE'
+    'AVAILABLE',
+    65.00
 ),
 (
     'JKL-9876',
@@ -51,5 +55,6 @@ INSERT INTO VEHICLES (
     2019,
     120000,
     'D',
-    'UNAVAILABLE'
+    'UNAVAILABLE',
+    120.00
 );

@@ -29,7 +29,7 @@ public class VehicleUpdateController {
         }
     }
 
-    @GetMapping("/update/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<VehicleUpdateDto> updateVehicle(@PathVariable Long id, @RequestBody VehicleUpdateDto vehicleUpdateDto) {
         int rowsAffected = vehicleUpdateService.updateVehicle(id, vehicleUpdateDto);
