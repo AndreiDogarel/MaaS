@@ -1,0 +1,28 @@
+CREATE TABLE IF NOT EXISTS VEHICLES (
+                                        ID BIGSERIAL PRIMARY KEY,
+                                        REGISTRATION_NUMBER VARCHAR(32) NOT NULL,
+                                        BRAND VARCHAR(64) NOT NULL,
+                                        MODEL VARCHAR(64) NOT NULL,
+                                        YEAR INT NOT NULL,
+                                        MILEAGE BIGINT NOT NULL DEFAULT 0,
+                                        LICENSE_CATEGORY VARCHAR(8) NOT NULL,
+                                        STATUS VARCHAR(32) NOT NULL DEFAULT 'AVAILABLE',
+                                        PRICE_PER_DAY NUMERIC(10,2) NOT NULL DEFAULT 0,
+                                        CREATED_AT TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                                        UPDATED_AT TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS UX_VEHICLES_REGISTRATION ON VEHICLES (REGISTRATION_NUMBER);
+
+CREATE OR REPLACE FUNCTION TRG_VEHICLES_UPDATED_AT()
+    RETURNS TRIGGER LANGUAGE PLPGSQL AS $$
+BEGIN
+    NEW.UPDATED_AT = NOW();
+    RETURN NEW;
+END $$;
+
+DROP TRIGGER IF EXISTS VEHICLES_SET_UPDATED_AT ON VEHICLES;
+
+CREATE TRIGGER VEHICLES_SET_UPDATED_AT
+    BEFORE UPDATE ON VEHICLES
+    FOR EACH ROW EXECUTE FUNCTION TRG_VEHICLES_UPDATED_AT();

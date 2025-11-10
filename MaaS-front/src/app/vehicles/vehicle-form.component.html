@@ -1,0 +1,16 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <input formControlName="registrationNumber" placeholder="Registration number">
+  <input formControlName="brand" placeholder="Brand">
+  <input formControlName="model" placeholder="Model">
+  <input type="number" formControlName="year" placeholder="Year">
+  <input type="number" formControlName="mileage" placeholder="Mileage">
+  <input formControlName="licenseCategory" placeholder="License category">
+  <select formControlName="status">
+    <option value="AVAILABLE">AVAILABLE</option>
+    <option value="UNAVAILABLE">UNAVAILABLE</option>
+    <option value="MAINTENANCE">MAINTENANCE</option>
+  </select>
+  <input type="number" step="0.01" formControlName="pricePerDay" placeholder="Price/day">
+  <button type="submit" [disabled]="submitting">Add vehicle</button>
+  <div *ngIf="errorMsg">{{ errorMsg }}</div>
+</form>
