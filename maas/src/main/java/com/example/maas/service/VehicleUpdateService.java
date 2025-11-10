@@ -29,7 +29,8 @@ public class VehicleUpdateService {
     };
 
     public VehicleDto getVehicleById(Long id) {
-        String sql = "SELECT registration_number, brand, model, mileage, status, license_category FROM vehicles WHERE id = ?";
+        String sql = "SELECT registration_number, brand, model, year, mileage, status, license_category, status FROM vehicles WHERE " +
+                "id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, vehicleRowMapper, id);
         } catch (EmptyResultDataAccessException e) {
