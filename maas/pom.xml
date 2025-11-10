@@ -98,6 +98,15 @@
 
 	<build>
 		<plugins>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>11.7.2</version> <configuration>
+                <url>jdbc:postgresql://localhost:5432/mydb</url>
+                <user>myuser</user>
+                <password>mypassword</password>
+            </configuration>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
