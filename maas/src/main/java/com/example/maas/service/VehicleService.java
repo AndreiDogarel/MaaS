@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VehicleService {
@@ -23,6 +24,7 @@ public class VehicleService {
 
     private final RowMapper<VehicleDto> vehicleRowMapper = (rs, rowNum) -> {
         VehicleDto vehicle = new VehicleDto();
+        vehicle.setId(rs.getObject("id", Long.class));
         vehicle.setRegistrationNumber(rs.getObject("registration_number", String.class));
         vehicle.setBrand(rs.getObject("brand", String.class));
         vehicle.setModel(rs.getObject("model", String.class));
@@ -36,6 +38,11 @@ public class VehicleService {
     public List<VehicleDto> getAllVehicles() {
         String sql = "SELECT * FROM vehicles";
         return jdbcTemplate.query(sql, vehicleRowMapper);
+    }
+
+    public Optional<VehicleDto> getVehicleById(Long id) {
+        String sql = "SELECT * FROM vehicles WHERE id = ?";
+        return jdbcTemplate.query(sql, new Object[]{id}, vehicleRowMapper).stream().findFirst();
     }
 
     public Vehicle create(CreateVehicleRequest r) {

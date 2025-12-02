@@ -105,6 +105,7 @@
                 <url>jdbc:postgresql://localhost:5432/mydb</url>
                 <user>myuser</user>
                 <password>mypassword</password>
+                <cleanDisabled>false</cleanDisabled>
             </configuration>
             </plugin>
 			<plugin>

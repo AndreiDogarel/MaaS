@@ -1,13 +1,10 @@
 package com.example.maas.controller;
 
-import com.example.maas.entities.CreateVehicleRequest;
-import com.example.maas.entities.Vehicle;
-import com.example.maas.entities.VehicleDto;
-import com.example.maas.entities.VehicleSearchDto;
+import com.example.maas.entities.*;
+import com.example.maas.service.MaintenanceService;
+import com.example.maas.service.TowingService;
 import com.example.maas.service.VehicleService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,12 +12,42 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/vehicles")
 public class VehicleController {
-    private final VehicleService service;
-    public VehicleController(VehicleService service) { this.service = service; }
 
-    @GetMapping("/all")
-    public List<VehicleDto> getAllVehicles() {
-        return service.getAllVehicles();
+    private final VehicleService vehicleService;
+    private final MaintenanceService maintenanceService;
+    private final TowingService towingService;
+
+    public VehicleController(VehicleService vehicleService, MaintenanceService maintenanceService, TowingService towingService) {
+        this.vehicleService = vehicleService;
+        this.maintenanceService = maintenanceService;
+        this.towingService = towingService;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<VehicleDto> getVehicleById(@PathVariable Long id) {
+        return vehicleService.getVehicleById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/maintenance")
+    public List<Maintenance> getMaintenanceHistory(@PathVariable Long id) {
+        return maintenanceService.getMaintenanceHistory(id);
+    }
+
+    @GetMapping("/{id}/towing")
+    public List<Towing> getTowingHistory(@PathVariable Long id) {
+        return towingService.getTowingHistory(id);
+    }
+
+    @PostMapping("/{id}/towing")
+    public Towing addTowing(@RequestBody TowingDto towing) {
+        return towingService.createTowing(towing);
+    }
+
+    @PostMapping("/{id}/maintenance")
+    public Maintenance addMaintenance(@RequestBody MaintenanceDto maintenance) {
+        return maintenanceService.createMaintenance(maintenance);
     }
 
     @GetMapping("/search")
@@ -42,14 +69,6 @@ public class VehicleController {
                 licenseCategory,
                 status
         );
-        return service.searchVehicles(searchParams);
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
-    public Vehicle create(@RequestBody @Valid CreateVehicleRequest req) {
-        return service.create(req);
+        return vehicleService.searchVehicles(searchParams);
     }
 }
-

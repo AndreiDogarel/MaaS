@@ -25,4 +25,24 @@ export class VehicleService {
 
     return this.http.get<Vehicle[]>(`${this.base}/search`, { params: httpParams });
   }
+
+  getVehicleById(id: string): Observable<Vehicle> {
+    return this.http.get<Vehicle>(`${this.base}/${id}`);
+  }
+
+  getMaintenanceHistory(id: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.base}/${id}/maintenance`);
+  }
+
+  getTowingHistory(id: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.base}/${id}/towing`);
+  }
+
+  addMaintenanceRecord(id: string, maintenance: any): Observable<any> {
+    return this.http.post<any>(`${this.base}/${id}/maintenance`, maintenance);
+  }
+
+  addTowingRecord(id: string, towing: any): Observable<any> {
+    return this.http.post<any>(`${this.base}/${id}/towing`, towing);
+  }
 }
