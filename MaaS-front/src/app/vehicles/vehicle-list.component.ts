@@ -3,11 +3,12 @@ import { VehicleService } from './vehicle.service';
 import { Vehicle } from './vehicle.model';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-vehicle-list',
   templateUrl: './vehicle-list.component.html',
-    imports: [CommonModule, DecimalPipe, FormsModule]
+    imports: [CommonModule, DecimalPipe, FormsModule, RouterModule]
 })
 export class VehicleListComponent implements OnInit {
   vehicles: Vehicle[] = [];
