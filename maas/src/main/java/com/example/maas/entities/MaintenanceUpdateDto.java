@@ -1,10 +1,14 @@
 package com.example.maas.entities;
 
+import lombok.*;
 import java.time.LocalDate;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MaintenanceUpdateDto {
-    LocalDate date;
-    String type;
-    String description;
-    Double cost;
+    private LocalDate date;
+    private String type;
+    private String description;
+    private Double cost;
 }

@@ -26,6 +26,10 @@ public class TowingService {
         return towingRepository.findByVehicleId(vehicleId);
     }
 
+    public Optional<Towing> getTowingById(Long towingId) {
+        return towingRepository.findById(towingId);
+    }
+
     public Towing createTowing(TowingDto towingDto) {
         Vehicle vehicle = vehicleRepository.findById(towingDto.getVehicleId())
                 .orElseThrow(() -> new EntityNotFoundException("Vehicle not found with ID: " + towingDto.getVehicleId()));
@@ -51,5 +55,13 @@ public class TowingService {
         existingTowing.setDuration(updateDto.getDuration());
 
         return towingRepository.save(existingTowing);
+    }
+
+    public boolean deleteTowing(Long towingId) {
+        if (!towingRepository.existsById(towingId)) {
+            return false;
+        }
+        towingRepository.deleteById(towingId);
+        return true;
     }
 }

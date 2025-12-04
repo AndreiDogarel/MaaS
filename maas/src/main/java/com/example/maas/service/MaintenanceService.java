@@ -2,6 +2,7 @@ package com.example.maas.service;
 
 import com.example.maas.entities.Maintenance;
 import com.example.maas.entities.MaintenanceDto;
+import com.example.maas.entities.MaintenanceUpdateDto;
 import com.example.maas.entities.Vehicle;
 import com.example.maas.repository.MaintenanceRepository;
 import com.example.maas.repository.VehicleRepository;
@@ -36,10 +37,30 @@ public class MaintenanceService {
         return maintenanceRepository.save(entity);
     }
 
-    public Maintenance updateMaintenance(Maintenance maintenance) {
-        maintenanceRepository.findById(maintenance.getId()).orElseThrow(() -> new RuntimeException("maintenance not found"));
+    public Optional<Maintenance> getMaintenanceById(Long maintenanceId) {
+        return maintenanceRepository.findById(maintenanceId);
+    }
 
-        return maintenanceRepository.save(maintenance);
+    public Maintenance updateMaintenance(Long maintenanceId, MaintenanceUpdateDto updateDto) {
+        Maintenance existing = maintenanceRepository.findById(maintenanceId)
+                .orElseThrow(() -> new EntityNotFoundException("Maintenance not found with ID: " + maintenanceId));
+
+        if (updateDto != null) {
+            existing.setDate(updateDto.getDate());
+            existing.setType(updateDto.getType());
+            existing.setDescription(updateDto.getDescription());
+            existing.setCost(updateDto.getCost());
+        }
+
+        return maintenanceRepository.save(existing);
+    }
+
+    public boolean deleteMaintenance(Long maintenanceId) {
+        if (!maintenanceRepository.existsById(maintenanceId)) {
+            return false;
+        }
+        maintenanceRepository.deleteById(maintenanceId);
+        return true;
     }
 
     public List<Maintenance> getMaintenanceHistory(Long vehicleId) {
