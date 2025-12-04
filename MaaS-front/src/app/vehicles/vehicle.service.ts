@@ -45,4 +45,20 @@ export class VehicleService {
   addTowingRecord(id: string, towing: any): Observable<any> {
     return this.http.post<any>(`${this.base}/${id}/towing`, towing);
   }
+  
+  updateMaintenanceRecord(vehicleId: string, maintenanceId: string | number, maintenance: any): Observable<any> {
+    return this.http.put<any>(`${this.base}/${vehicleId}/maintenance/${maintenanceId}`, maintenance);
+  }
+
+  deleteMaintenanceRecord(vehicleId: string, maintenanceId: string | number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${vehicleId}/maintenance/${maintenanceId}`);
+  }
+
+  updateTowingRecord(vehicleId: string, towingId: string | number, towing: any): Observable<any> {
+    return this.http.put<any>(`${this.base}/${vehicleId}/towing/${towingId}`, towing);
+  }
+
+  deleteTowingRecord(vehicleId: string, towingId: string | number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${vehicleId}/towing/${towingId}`);
+  }
 }

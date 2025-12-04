@@ -59,8 +59,8 @@
         <input id="maintenance-cost" type="number" [(ngModel)]="maintenanceForm.cost" name="cost" placeholder="0.00" step="0.01">
       </div>
       <div class="form-actions">
-        <button type="submit" [disabled]="maintenanceFormSubmitting">{{ maintenanceFormSubmitting ? 'Submitting...' : 'Add Maintenance' }}</button>
-        <button type="button" (click)="toggleMaintenanceForm()" class="cancel-button">Cancel</button>
+        <button type="submit" [disabled]="maintenanceFormSubmitting">{{ isEditingMaintenance ? (maintenanceFormSubmitting ? 'Saving...' : 'Save') : (maintenanceFormSubmitting ? 'Submitting...' : 'Add Maintenance') }}</button>
+        <button type="button" (click)="cancelMaintenanceEdit()" class="cancel-button">Cancel</button>
       </div>
     </form>
 
@@ -80,6 +80,10 @@
             <td>{{ record.type }}</td>
             <td>{{ record.description }}</td>
             <td>{{ record.cost | currency }}</td>
+            <td>
+              <button type="button" class="action-button" (click)="beginEditMaintenance(record)">Edit</button>
+              <button type="button" class="action-button danger-button" (click)="deleteMaintenance(record)">Delete</button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -113,8 +117,8 @@
         <input id="towing-duration" type="number" [(ngModel)]="towingForm.duration" name="duration" placeholder="Duration in minutes">
       </div>
       <div class="form-actions">
-        <button type="submit" [disabled]="towingFormSubmitting">{{ towingFormSubmitting ? 'Submitting...' : 'Add Towing' }}</button>
-        <button type="button" (click)="toggleTowingForm()" class="cancel-button">Cancel</button>
+        <button type="submit" [disabled]="towingFormSubmitting">{{ isEditingTowing ? (towingFormSubmitting ? 'Saving...' : 'Save') : (towingFormSubmitting ? 'Submitting...' : 'Add Towing') }}</button>
+        <button type="button" (click)="cancelTowingEdit()" class="cancel-button">Cancel</button>
       </div>
     </form>
 
@@ -134,6 +138,10 @@
             <td>{{ record.location }}</td>
             <td>{{ record.reason }}</td>
             <td>{{ record.duration }} min</td>
+            <td>
+              <button type="button" class="action-button" (click)="beginEditTowing(record)">Edit</button>
+              <button type="button" class="action-button danger-button" (click)="deleteTowing(record)">Delete</button>
+            </td>
           </tr>
         </tbody>
       </table>

@@ -52,6 +52,25 @@ section {
   background-color: #218838;
 }
 
+.action-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-right: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.action-button:hover { background-color: #0056b3; }
+
+.danger-button {
+  background-color: #dc3545;
+}
+
+.danger-button:hover { background-color: #b02a37; }
+
 .add-form {
   background-color: white;
   padding: 20px;
