@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.example.maas.repository.VehicleRepository;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -22,6 +23,9 @@ public class AdminController {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
 
     @DeleteMapping("/deleteUser/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -55,5 +59,12 @@ public class AdminController {
         user.setUsername(newUsername);
         userRepository.save(user);
         return "Username updated successfully";
+    }
+
+    @DeleteMapping("/deleteDecommissionedVehicles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String deleteDecommissionedVehicles() {
+        vehicleRepository.deleteDecommissionedVehicles();
+        return "Decommissioned vehicles deleted successfully";
     }
 }
