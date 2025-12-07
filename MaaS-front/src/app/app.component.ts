@@ -10,7 +10,8 @@ import { VehicleDetailComponent } from './vehicles/vehicle-detail.component';
   selector: 'app-root',
   standalone: true,
   imports: [RouterModule, FormsModule, ReactiveFormsModule, HelloWorldComponent, UsersListComponent, VehicleListComponent, VehicleDetailComponent],
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
 }

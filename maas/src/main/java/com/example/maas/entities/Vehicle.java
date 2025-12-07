@@ -3,6 +3,9 @@ package com.example.maas.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "vehicles", uniqueConstraints = {
         @UniqueConstraint(name = "ux_vehicles_registration", columnNames = "registration_number")
@@ -32,4 +35,10 @@ public class Vehicle {
 
     @Column(nullable = false, length = 32)
     private String status;
+
+    @Column(nullable = false)
+    private Long pricePerDay;
+
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Rental> rentals = new ArrayList<>();
 }

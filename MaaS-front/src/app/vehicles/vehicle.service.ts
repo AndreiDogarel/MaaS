@@ -6,8 +6,12 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class VehicleService {
   private base = 'http://localhost:8080/api/vehicles';
+
   constructor(private http: HttpClient) {}
-  create(v: Vehicle) { return this.http.post<Vehicle>(this.base, v); }
+
+  create(v: Vehicle) {
+    return this.http.post<Vehicle>(this.base, v);
+  }
 
   getAllVehicles(): Observable<Vehicle[]> {
     return this.http.get<Vehicle[]>(`${this.base}/all`);
@@ -45,7 +49,7 @@ export class VehicleService {
   addTowingRecord(id: string, towing: any): Observable<any> {
     return this.http.post<any>(`${this.base}/${id}/towing`, towing);
   }
-  
+
   updateMaintenanceRecord(vehicleId: string, maintenanceId: string | number, maintenance: any): Observable<any> {
     return this.http.put<any>(`${this.base}/${vehicleId}/maintenance/${maintenanceId}`, maintenance);
   }
@@ -60,5 +64,21 @@ export class VehicleService {
 
   deleteTowingRecord(vehicleId: string, towingId: string | number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${vehicleId}/towing/${towingId}`);
+  }
+
+  getRentalHistory(id: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.base}/${id}/rentals`);
+  }
+
+  addRentalRecord(id: string, rental: any): Observable<any> {
+    return this.http.post<any>(`${this.base}/${id}/rentals`, rental);
+  }
+
+  updateRentalRecord(vehicleId: string, rentalId: string | number, rental: any): Observable<any> {
+    return this.http.put<any>(`${this.base}/${vehicleId}/rentals/${rentalId}`, rental);
+  }
+
+  deleteRentalRecord(vehicleId: string, rentalId: string | number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${vehicleId}/rentals/${rentalId}`);
   }
 }

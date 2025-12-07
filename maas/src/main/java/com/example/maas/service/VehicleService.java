@@ -5,7 +5,6 @@ import com.example.maas.entities.Vehicle;
 import com.example.maas.entities.VehicleDto;
 import com.example.maas.entities.VehicleSearchDto;
 import com.example.maas.repository.VehicleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,11 +15,9 @@ import java.util.Optional;
 
 @Service
 public class VehicleService {
-    private final VehicleRepository repo;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
-    public VehicleService(VehicleRepository repo) { this.repo = repo; }
+    private final VehicleRepository repo;
+    private final JdbcTemplate jdbcTemplate;
 
     private final RowMapper<VehicleDto> vehicleRowMapper = (rs, rowNum) -> {
         VehicleDto vehicle = new VehicleDto();
@@ -32,8 +29,14 @@ public class VehicleService {
         vehicle.setMileage(rs.getObject("mileage", Long.class));
         vehicle.setLicenseCategory(rs.getString("license_category"));
         vehicle.setStatus(rs.getString("status"));
+        vehicle.setPricePerDay(rs.getLong("price_per_day"));
         return vehicle;
     };
+
+    public VehicleService(VehicleRepository repo, JdbcTemplate jdbcTemplate) {
+        this.repo = repo;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     public List<VehicleDto> getAllVehicles() {
         String sql = "SELECT * FROM vehicles";
@@ -42,15 +45,20 @@ public class VehicleService {
 
     public Optional<VehicleDto> getVehicleById(Long id) {
         String sql = "SELECT * FROM vehicles WHERE id = ?";
-        return jdbcTemplate.query(sql, new Object[]{id}, vehicleRowMapper).stream().findFirst();
+        return jdbcTemplate.query(sql, new Object[]{id}, vehicleRowMapper)
+                .stream()
+                .findFirst();
     }
 
     public Vehicle create(CreateVehicleRequest r) {
-        if (repo.existsByRegistrationNumber(r.registrationNumber()))
+        if (repo.existsByRegistrationNumber(r.registrationNumber())) {
             throw new IllegalArgumentException("registrationNumber already exists");
-        if (r.year() < 1980 || r.year() > 2025)
+        }
+        if (r.year() < 1980 || r.year() > 2025) {
             throw new IllegalArgumentException("year out of range");
-        var v = Vehicle.builder()
+        }
+
+        Vehicle v = Vehicle.builder()
                 .registrationNumber(r.registrationNumber())
                 .brand(r.brand())
                 .model(r.model())
@@ -58,7 +66,9 @@ public class VehicleService {
                 .mileage(r.mileage())
                 .licenseCategory(r.licenseCategory())
                 .status(r.status())
+                .pricePerDay(r.pricePerDay())
                 .build();
+
         try {
             return repo.save(v);
         } catch (DataIntegrityViolationException e) {
@@ -70,37 +80,41 @@ public class VehicleService {
         StringBuilder sql = new StringBuilder("SELECT * FROM vehicles WHERE 1=1");
         List<Object> args = new java.util.ArrayList<>();
 
-        // Add brand filter
+        if (searchParams.getRegistrationNumber() != null && !searchParams.getRegistrationNumber().isBlank()) {
+            sql.append(" AND registration_number ILIKE ?");
+            args.add("%" + searchParams.getRegistrationNumber() + "%");
+        }
+
         if (searchParams.getBrand() != null && !searchParams.getBrand().isBlank()) {
-            sql.append(" AND brand ILIKE ?"); // ILIKE for case-insensitive search in PostgreSQL
+            sql.append(" AND brand ILIKE ?");
             args.add("%" + searchParams.getBrand() + "%");
         }
 
-        // Add model filter
         if (searchParams.getModel() != null && !searchParams.getModel().isBlank()) {
             sql.append(" AND model ILIKE ?");
             args.add("%" + searchParams.getModel() + "%");
         }
 
-        // Add license category filter
         if (searchParams.getLicenseCategory() != null && !searchParams.getLicenseCategory().isBlank()) {
             sql.append(" AND license_category = ?");
             args.add(searchParams.getLicenseCategory());
         }
 
-        // Add status filter
         if (searchParams.getStatus() != null && !searchParams.getStatus().isBlank()) {
             sql.append(" AND status = ?");
             args.add(searchParams.getStatus());
         }
 
-        // Add year filter (e.g., year greater than or equal to)
         if (searchParams.getYear() != null) {
             sql.append(" AND year >= ?");
             args.add(searchParams.getYear());
         }
 
-        // Execute the query using the dynamic SQL string and arguments
+        if (searchParams.getPricePerDay() != null) {
+            sql.append(" AND price_per_day >= ?");
+            args.add(searchParams.getPricePerDay());
+        }
+
         return jdbcTemplate.query(sql.toString(), args.toArray(), vehicleRowMapper);
     }
 }

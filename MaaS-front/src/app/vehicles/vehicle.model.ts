@@ -1,3 +1,5 @@
+import { Rental } from "../rentals/rental.model";
+
 export interface Vehicle {
   id?: number;
   registrationNumber: string;
@@ -7,4 +9,6 @@ export interface Vehicle {
   mileage: number;
   licenseCategory: string;
   status: string;
+  pricePerDay: number;
+  rentals?: Rental[];
 }

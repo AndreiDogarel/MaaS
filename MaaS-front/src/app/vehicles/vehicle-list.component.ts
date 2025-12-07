@@ -8,11 +8,12 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-vehicle-list',
   templateUrl: './vehicle-list.component.html',
-    imports: [CommonModule, DecimalPipe, FormsModule, RouterModule]
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, DecimalPipe]
 })
 export class VehicleListComponent implements OnInit {
   vehicles: Vehicle[] = [];
-  isLoading: boolean = true;
+  isLoading = true;
   error: any = null;
 
   search = {
@@ -23,7 +24,7 @@ export class VehicleListComponent implements OnInit {
     year: null as number | null
   };
 
-  constructor(private vehicleService: VehicleService) { }
+  constructor(private vehicleService: VehicleService) {}
 
   ngOnInit(): void {
     this.executeSearch();
@@ -46,7 +47,7 @@ export class VehicleListComponent implements OnInit {
       }
     });
   }
-  
+
   resetSearch(): void {
     this.search = {
       brand: '',
@@ -55,7 +56,7 @@ export class VehicleListComponent implements OnInit {
       status: '',
       year: null
     };
-    
-    this.executeSearch(); 
+
+    this.executeSearch();
   }
 }

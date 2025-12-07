@@ -32,7 +32,86 @@
         <td><strong>Status:</strong></td>
         <td [class.available]="vehicle.status === 'AVAILABLE'">{{ vehicle.status }}</td>
       </tr>
+      <tr>
+        <td><strong>Price per day:</strong></td>
+        <td>{{ vehicle.pricePerDay | number:'1.2-2' }}</td>
+      </tr>
     </table>
+  </section>
+
+  <section class="rental-history">
+    <div class="section-header">
+      <h2>Rental History</h2>
+      <button (click)="toggleRentalForm()" class="add-button">
+        {{ showRentalForm ? 'Cancel' : '+ Add Rental' }}
+      </button>
+    </div>
+
+    <form *ngIf="showRentalForm" (ngSubmit)="submitRentalForm()" class="add-form">
+      <div class="form-group">
+        <label for="rental-start">Start date:</label>
+        <input id="rental-start" type="date" [(ngModel)]="rentalForm.startDate" name="startDate" required>
+      </div>
+      <div class="form-group">
+        <label for="rental-end">End date:</label>
+        <input id="rental-end" type="date" [(ngModel)]="rentalForm.endDate" name="endDate">
+      </div>
+      <div class="form-group">
+        <label for="rental-status">Status:</label>
+        <input id="rental-status" type="text" [(ngModel)]="rentalForm.status" name="status" placeholder="e.g., ACTIVE, COMPLETED" required>
+      </div>
+      <div class="form-group">
+        <label for="odometer-start">Odometer start:</label>
+        <input id="odometer-start" type="number" [(ngModel)]="rentalForm.odometerStart" name="odometerStart" placeholder="Start km">
+      </div>
+      <div class="form-group">
+        <label for="odometer-end">Odometer end:</label>
+        <input id="odometer-end" type="number" [(ngModel)]="rentalForm.odometerEnd" name="odometerEnd" placeholder="End km">
+      </div>
+      <div class="form-group">
+        <label for="total-price">Total price:</label>
+        <input id="total-price" type="number" step="0.01" [(ngModel)]="rentalForm.totalPrice" name="totalPrice" placeholder="Total price">
+      </div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="rentalFormSubmitting">
+          {{ rentalFormSubmitting ? 'Submitting...' : (isEditingRental ? 'Update Rental' : 'Add Rental') }}
+        </button>
+        <button type="button" (click)="cancelRentalEdit()" class="cancel-button">Cancel</button>
+      </div>
+    </form>
+
+    <div *ngIf="rentalHistory.length > 0">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Start date</th>
+            <th>End date</th>
+            <th>Status</th>
+            <th>Odometer start</th>
+            <th>Odometer end</th>
+            <th>Total price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of rentalHistory">
+            <td>{{ record.startDate | date:'mediumDate' }}</td>
+            <td>{{ record.endDate ? (record.endDate | date:'mediumDate') : '-' }}</td>
+            <td>{{ record.status }}</td>
+            <td>{{ record.odometerStart ?? '-' }}</td>
+            <td>{{ record.odometerEnd ?? '-' }}</td>
+            <td>{{ record.totalPrice != null ? (record.totalPrice | number:'1.2-2') : '-' }}</td>
+            <td>
+              <button type="button" class="action-button" (click)="beginEditRental(record)">Edit</button>
+              <button type="button" class="action-button danger-button" (click)="deleteRental(record)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div *ngIf="rentalHistory.length === 0" class="no-data-message">
+      No rental records found.
+    </div>
   </section>
 
   <section class="maintenance-history">
@@ -56,10 +135,12 @@
       </div>
       <div class="form-group">
         <label for="maintenance-cost">Cost:</label>
-        <input id="maintenance-cost" type="number" [(ngModel)]="maintenanceForm.cost" name="cost" placeholder="0.00" step="0.01">
+        <input id="maintenance-cost" type="number" [(ngModel)]="maintenanceForm.cost" name="cost" placeholder="Cost in EUR">
       </div>
       <div class="form-actions">
-        <button type="submit" [disabled]="maintenanceFormSubmitting">{{ isEditingMaintenance ? (maintenanceFormSubmitting ? 'Saving...' : 'Save') : (maintenanceFormSubmitting ? 'Submitting...' : 'Add Maintenance') }}</button>
+        <button type="submit" [disabled]="maintenanceFormSubmitting">
+          {{ maintenanceFormSubmitting ? 'Submitting...' : (isEditingMaintenance ? 'Update Maintenance' : 'Add Maintenance') }}
+        </button>
         <button type="button" (click)="cancelMaintenanceEdit()" class="cancel-button">Cancel</button>
       </div>
     </form>
@@ -72,6 +153,7 @@
             <th>Type</th>
             <th>Description</th>
             <th>Cost</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -79,7 +161,7 @@
             <td>{{ record.date | date: 'short' }}</td>
             <td>{{ record.type }}</td>
             <td>{{ record.description }}</td>
-            <td>{{ record.cost | currency }}</td>
+            <td>{{ record.cost | number:'1.2-2' }}</td>
             <td>
               <button type="button" class="action-button" (click)="beginEditMaintenance(record)">Edit</button>
               <button type="button" class="action-button danger-button" (click)="deleteMaintenance(record)">Delete</button>
@@ -117,7 +199,9 @@
         <input id="towing-duration" type="number" [(ngModel)]="towingForm.duration" name="duration" placeholder="Duration in minutes">
       </div>
       <div class="form-actions">
-        <button type="submit" [disabled]="towingFormSubmitting">{{ isEditingTowing ? (towingFormSubmitting ? 'Saving...' : 'Save') : (towingFormSubmitting ? 'Submitting...' : 'Add Towing') }}</button>
+        <button type="submit" [disabled]="towingFormSubmitting">
+          {{ towingFormSubmitting ? 'Submitting...' : (isEditingTowing ? 'Update Towing' : 'Add Towing') }}
+        </button>
         <button type="button" (click)="cancelTowingEdit()" class="cancel-button">Cancel</button>
       </div>
     </form>
@@ -130,6 +214,7 @@
             <th>Location</th>
             <th>Reason</th>
             <th>Duration</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -137,7 +222,7 @@
             <td>{{ record.date | date: 'short' }}</td>
             <td>{{ record.location }}</td>
             <td>{{ record.reason }}</td>
-            <td>{{ record.duration }} min</td>
+            <td>{{ record.duration }} minutes</td>
             <td>
               <button type="button" class="action-button" (click)="beginEditTowing(record)">Edit</button>
               <button type="button" class="action-button danger-button" (click)="deleteTowing(record)">Delete</button>

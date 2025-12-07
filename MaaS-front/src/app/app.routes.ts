@@ -5,6 +5,7 @@ import { VehicleListComponent } from './vehicles/vehicle-list.component';
 import { VehicleDetailComponent } from './vehicles/vehicle-detail.component';
 
 export const routes: Routes = [
+    { path: '', redirectTo: 'vehicles', pathMatch: 'full' },
     { path: 'users', component: UsersListComponent },
     { path: 'vehicles', component: VehicleListComponent },
     { path: 'vehicles/new', component: VehicleFormComponent },
