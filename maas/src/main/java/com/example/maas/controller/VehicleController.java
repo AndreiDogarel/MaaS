@@ -1,13 +1,10 @@
 package com.example.maas.controller;
 
-import com.example.maas.entities.CreateVehicleRequest;
-import com.example.maas.entities.Vehicle;
-import com.example.maas.entities.VehicleDto;
-import com.example.maas.entities.VehicleSearchDto;
+import com.example.maas.entities.*;
+import com.example.maas.service.MaintenanceService;
+import com.example.maas.service.TowingService;
 import com.example.maas.service.VehicleService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,12 +12,106 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/vehicles")
 public class VehicleController {
-    private final VehicleService service;
-    public VehicleController(VehicleService service) { this.service = service; }
 
-    @GetMapping("/all")
-    public List<VehicleDto> getAllVehicles() {
-        return service.getAllVehicles();
+    private final VehicleService vehicleService;
+    private final MaintenanceService maintenanceService;
+    private final TowingService towingService;
+
+    public VehicleController(VehicleService vehicleService, MaintenanceService maintenanceService, TowingService towingService) {
+        this.vehicleService = vehicleService;
+        this.maintenanceService = maintenanceService;
+        this.towingService = towingService;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<VehicleDto> getVehicleById(@PathVariable Long id) {
+        return vehicleService.getVehicleById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/maintenance")
+    public List<Maintenance> getMaintenanceHistory(@PathVariable Long id) {
+        return maintenanceService.getMaintenanceHistory(id);
+    }
+
+    @GetMapping("/{id}/towing")
+    public List<Towing> getTowingHistory(@PathVariable Long id) {
+        return towingService.getTowingHistory(id);
+    }
+
+    @PostMapping("/{id}/towing")
+    public ResponseEntity<Towing> addTowing(@PathVariable Long id, @RequestBody TowingDto towing) {
+        if (towing == null || towing.getVehicleId() == null || !id.equals(towing.getVehicleId())) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            Towing created = towingService.createTowing(towing);
+            return ResponseEntity.ok(created);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{id}/maintenance")
+    public ResponseEntity<Maintenance> addMaintenance(@PathVariable Long id, @RequestBody MaintenanceDto maintenance) {
+        if (maintenance == null || maintenance.getVehicleId() == null || !id.equals(maintenance.getVehicleId())) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            Maintenance created = maintenanceService.createMaintenance(maintenance);
+            return ResponseEntity.ok(created);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{id}/towing/{towingId}")
+    public ResponseEntity<Towing> getTowingById(@PathVariable Long id, @PathVariable Long towingId) {
+        return towingService.getTowingById(towingId)
+                .filter(t -> t.getVehicle() != null && t.getVehicle().getId().equals(id))
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}/towing/{towingId}")
+    public ResponseEntity<Towing> updateTowing(@PathVariable Long id, @PathVariable Long towingId, @RequestBody TowingUpdateDto dto) {
+        return towingService.getTowingById(towingId)
+                .filter(t -> t.getVehicle() != null && t.getVehicle().getId().equals(id))
+                .map(existing -> ResponseEntity.ok(towingService.updateTowing(towingId, dto)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}/towing/{towingId}")
+    public ResponseEntity<?> deleteTowing(@PathVariable Long id, @PathVariable Long towingId) {
+        return towingService.getTowingById(towingId)
+                .filter(t -> t.getVehicle() != null && t.getVehicle().getId().equals(id))
+                .map(existing -> towingService.deleteTowing(towingId) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build())
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/maintenance/{maintenanceId}")
+    public ResponseEntity<Maintenance> getMaintenanceById(@PathVariable Long id, @PathVariable Long maintenanceId) {
+        return maintenanceService.getMaintenanceById(maintenanceId)
+                .filter(m -> m.getVehicle() != null && m.getVehicle().getId().equals(id))
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}/maintenance/{maintenanceId}")
+    public ResponseEntity<Maintenance> updateMaintenance(@PathVariable Long id, @PathVariable Long maintenanceId, @RequestBody MaintenanceUpdateDto dto) {
+        return maintenanceService.getMaintenanceById(maintenanceId)
+                .filter(m -> m.getVehicle() != null && m.getVehicle().getId().equals(id))
+                .map(existing -> ResponseEntity.ok(maintenanceService.updateMaintenance(maintenanceId, dto)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}/maintenance/{maintenanceId}")
+    public ResponseEntity<?> deleteMaintenance(@PathVariable Long id, @PathVariable Long maintenanceId) {
+        return maintenanceService.getMaintenanceById(maintenanceId)
+                .filter(m -> m.getVehicle() != null && m.getVehicle().getId().equals(id))
+                .map(existing -> maintenanceService.deleteMaintenance(maintenanceId) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build())
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/search")
@@ -42,14 +133,6 @@ public class VehicleController {
                 licenseCategory,
                 status
         );
-        return service.searchVehicles(searchParams);
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
-    public Vehicle create(@RequestBody @Valid CreateVehicleRequest req) {
-        return service.create(req);
+        return vehicleService.searchVehicles(searchParams);
     }
 }
-
