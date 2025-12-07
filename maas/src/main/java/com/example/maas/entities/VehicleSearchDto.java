@@ -15,4 +15,5 @@ public class VehicleSearchDto {
     private Long mileage;
     private String licenseCategory;
     private String status;
+    private Long pricePerDay;
 }

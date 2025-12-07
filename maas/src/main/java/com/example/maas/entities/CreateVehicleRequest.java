@@ -9,6 +9,7 @@ public record CreateVehicleRequest(
         @NotNull @Min(1980) @Max(2100) Integer year,
         @NotNull @Min(0) Long mileage,
         @NotBlank String licenseCategory,     // ex: B, C, D
-        @NotBlank String status            // AVAILABLE, UNAVAILABLE, MAINTENANCE
+        @NotBlank String status,          // AVAILABLE, UNAVAILABLE, MAINTENANCE
+        @NotBlank Long pricePerDay
 ) {}
 

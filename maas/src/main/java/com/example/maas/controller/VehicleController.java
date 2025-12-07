@@ -2,6 +2,7 @@ package com.example.maas.controller;
 
 import com.example.maas.entities.*;
 import com.example.maas.service.MaintenanceService;
+import com.example.maas.service.RentalService;
 import com.example.maas.service.TowingService;
 import com.example.maas.service.VehicleService;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,18 @@ public class VehicleController {
     private final VehicleService vehicleService;
     private final MaintenanceService maintenanceService;
     private final TowingService towingService;
+    private final RentalService rentalService;
 
-    public VehicleController(VehicleService vehicleService, MaintenanceService maintenanceService, TowingService towingService) {
+    public VehicleController(
+            VehicleService vehicleService,
+            MaintenanceService maintenanceService,
+            TowingService towingService,
+            RentalService rentalService
+    ) {
         this.vehicleService = vehicleService;
         this.maintenanceService = maintenanceService;
         this.towingService = towingService;
+        this.rentalService = rentalService;
     }
 
     @GetMapping("/{id}")
@@ -122,7 +130,8 @@ public class VehicleController {
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Long mileage,
             @RequestParam(required = false) String licenseCategory,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long pricePerDay
     ) {
         VehicleSearchDto searchParams = new VehicleSearchDto(
                 registrationNumber,
@@ -131,8 +140,51 @@ public class VehicleController {
                 year,
                 mileage,
                 licenseCategory,
-                status
+                status,
+                pricePerDay
         );
         return vehicleService.searchVehicles(searchParams);
+    }
+
+    @GetMapping("/{id}/rentals")
+    public List<Rental> getRentalHistory(@PathVariable Long id) {
+        return rentalService.getRentalHistory(id);
+    }
+
+    @PostMapping("/{id}/rentals")
+    public ResponseEntity<Rental> addRental(@PathVariable Long id, @RequestBody RentalDto rental) {
+        if (rental == null || rental.getVehicleId() == null || !id.equals(rental.getVehicleId())) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            Rental created = rentalService.createRental(rental);
+            return ResponseEntity.ok(created);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{id}/rentals/{rentalId}")
+    public ResponseEntity<Rental> getRentalById(@PathVariable Long id, @PathVariable Long rentalId) {
+        return rentalService.getRentalById(rentalId)
+                .filter(r -> r.getVehicle() != null && r.getVehicle().getId().equals(id))
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}/rentals/{rentalId}")
+    public ResponseEntity<Rental> updateRental(@PathVariable Long id, @PathVariable Long rentalId, @RequestBody RentalUpdateDto dto) {
+        return rentalService.getRentalById(rentalId)
+                .filter(r -> r.getVehicle() != null && r.getVehicle().getId().equals(id))
+                .map(existing -> ResponseEntity.ok(rentalService.updateRental(rentalId, dto)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}/rentals/{rentalId}")
+    public ResponseEntity<?> deleteRental(@PathVariable Long id, @PathVariable Long rentalId) {
+        return rentalService.getRentalById(rentalId)
+                .filter(r -> r.getVehicle() != null && r.getVehicle().getId().equals(id))
+                .map(existing -> rentalService.deleteRental(rentalId) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build())
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

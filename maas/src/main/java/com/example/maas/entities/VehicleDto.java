@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +18,6 @@ public class VehicleDto {
     private Long mileage;
     private String licenseCategory;
     private String status;
+    private Long pricePerDay;
+    private List<RentalDto> rentals;
 }

@@ -15,21 +15,25 @@ export class VehicleDetailComponent implements OnInit {
   vehicle: any;
   maintenanceHistory: any[] = [];
   towingHistory: any[] = [];
+  rentalHistory: any[] = [];
   isLoading = true;
   error: string | null = null;
 
-  // Form visibility and data
   showMaintenanceForm = false;
   showTowingForm = false;
+  showRentalForm = false;
   maintenanceFormSubmitting = false;
   towingFormSubmitting = false;
+  rentalFormSubmitting = false;
 
-  // Edit state
   isEditingMaintenance = false;
   editingMaintenanceId: number | null = null;
 
   isEditingTowing = false;
   editingTowingId: number | null = null;
+
+  isEditingRental = false;
+  editingRentalId: number | null = null;
 
   maintenanceForm = {
     date: '',
@@ -43,6 +47,15 @@ export class VehicleDetailComponent implements OnInit {
     location: '',
     reason: '',
     duration: null as number | null
+  };
+
+  rentalForm = {
+    startDate: '',
+    endDate: '',
+    status: '',
+    odometerStart: null as number | null,
+    odometerEnd: null as number | null,
+    totalPrice: null as number | null
   };
 
   constructor(
@@ -63,8 +76,9 @@ export class VehicleDetailComponent implements OnInit {
         this.vehicle = data;
         this.loadMaintenanceHistory(id);
         this.loadTowingHistory(id);
+        this.loadRentalHistory(id);
       },
-      error: (err) => {
+      error: () => {
         this.error = 'Failed to load vehicle details';
         this.isLoading = false;
       }
@@ -90,7 +104,15 @@ export class VehicleDetailComponent implements OnInit {
     });
   }
 
-  /* Maintenance */
+  loadRentalHistory(id: string): void {
+    this.vehicleService.getRentalHistory(id).subscribe({
+      next: (data) => {
+        this.rentalHistory = data;
+      },
+      error: (err) => console.error('Failed to load rental history', err)
+    });
+  }
+
   beginEditMaintenance(record: any): void {
     this.isEditingMaintenance = true;
     this.editingMaintenanceId = record.id ?? record.maintenanceId ?? null;
@@ -175,7 +197,6 @@ export class VehicleDetailComponent implements OnInit {
     });
   }
 
-  /* Towing */
   beginEditTowing(record: any): void {
     this.isEditingTowing = true;
     this.editingTowingId = record.id ?? record.towingId ?? null;
@@ -260,6 +281,94 @@ export class VehicleDetailComponent implements OnInit {
     });
   }
 
+  beginEditRental(record: any): void {
+    this.isEditingRental = true;
+    this.editingRentalId = record.id ?? record.rentalId ?? null;
+    this.showRentalForm = true;
+    this.rentalForm = {
+      startDate: record.startDate ? record.startDate.split('T')[0] : '',
+      endDate: record.endDate ? record.endDate.split('T')[0] : '',
+      status: record.status || '',
+      odometerStart: record.odometerStart ?? null,
+      odometerEnd: record.odometerEnd ?? null,
+      totalPrice: record.totalPrice ?? null
+    };
+  }
+
+  submitRentalForm(): void {
+    if (!this.rentalForm.startDate || !this.rentalForm.status) {
+      alert('Please fill in required fields (start date and status)');
+      return;
+    }
+
+    this.rentalFormSubmitting = true;
+    const payload = {
+      startDate: this.rentalForm.startDate,
+      endDate: this.rentalForm.endDate || null,
+      status: this.rentalForm.status,
+      odometerStart: this.rentalForm.odometerStart,
+      odometerEnd: this.rentalForm.odometerEnd,
+      totalPrice: this.rentalForm.totalPrice,
+      vehicleId: this.vehicle.id
+    };
+
+    if (this.isEditingRental && this.editingRentalId != null) {
+      this.vehicleService.updateRentalRecord(String(this.vehicle.id), String(this.editingRentalId), payload).subscribe({
+        next: (data) => {
+          const idx = this.rentalHistory.findIndex((r: any) => (r.id ?? r.rentalId) === this.editingRentalId);
+          if (idx !== -1) this.rentalHistory[idx] = data;
+          this.afterRentalSaved();
+        },
+        error: (err) => {
+          console.error('Failed to update rental record', err);
+          alert('Failed to update rental record');
+          this.rentalFormSubmitting = false;
+        }
+      });
+    } else {
+      this.vehicleService.addRentalRecord(String(this.vehicle.id), payload).subscribe({
+        next: (data) => {
+          this.rentalHistory.push(data);
+          this.afterRentalSaved();
+        },
+        error: (err) => {
+          console.error('Failed to add rental record', err);
+          alert('Failed to add rental record');
+          this.rentalFormSubmitting = false;
+        }
+      });
+    }
+  }
+
+  afterRentalSaved(): void {
+    this.resetRentalForm();
+    this.rentalFormSubmitting = false;
+    this.showRentalForm = false;
+    this.isEditingRental = false;
+    this.editingRentalId = null;
+  }
+
+  cancelRentalEdit(): void {
+    this.isEditingRental = false;
+    this.editingRentalId = null;
+    this.toggleRentalForm();
+  }
+
+  deleteRental(record: any): void {
+    const id = record.id ?? record.rentalId;
+    if (!id) return alert('Cannot determine rental id');
+    if (!confirm('Delete this rental record?')) return;
+    this.vehicleService.deleteRentalRecord(String(this.vehicle.id), String(id)).subscribe({
+      next: () => {
+        this.rentalHistory = this.rentalHistory.filter((r: any) => (r.id ?? r.rentalId) !== id);
+      },
+      error: (err) => {
+        console.error('Failed to delete rental record', err);
+        alert('Failed to delete rental record');
+      }
+    });
+  }
+
   resetMaintenanceForm(): void {
     this.maintenanceForm = {
       date: '',
@@ -278,6 +387,17 @@ export class VehicleDetailComponent implements OnInit {
     };
   }
 
+  resetRentalForm(): void {
+    this.rentalForm = {
+      startDate: '',
+      endDate: '',
+      status: '',
+      odometerStart: null,
+      odometerEnd: null,
+      totalPrice: null
+    };
+  }
+
   toggleMaintenanceForm(): void {
     this.showMaintenanceForm = !this.showMaintenanceForm;
     if (!this.showMaintenanceForm) {
@@ -293,6 +413,15 @@ export class VehicleDetailComponent implements OnInit {
       this.resetTowingForm();
       this.isEditingTowing = false;
       this.editingTowingId = null;
+    }
+  }
+
+  toggleRentalForm(): void {
+    this.showRentalForm = !this.showRentalForm;
+    if (!this.showRentalForm) {
+      this.resetRentalForm();
+      this.isEditingRental = false;
+      this.editingRentalId = null;
     }
   }
 }
