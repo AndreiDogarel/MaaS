@@ -7,6 +7,7 @@ import com.example.maas.service.TowingService;
 import com.example.maas.service.VehicleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 

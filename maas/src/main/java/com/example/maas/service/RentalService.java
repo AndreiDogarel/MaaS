@@ -20,13 +20,17 @@ public class RentalService {
     private final RentalRepository rentalRepository;
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
+    private final HasValidDocuments hasValidDocuments;
 
     public RentalService(RentalRepository rentalRepository,
                          VehicleRepository vehicleRepository,
-                         UserRepository userRepository) {
+                         UserRepository userRepository,
+                            HasValidDocuments hasValidDocuments
+    ) {
         this.rentalRepository = rentalRepository;
         this.vehicleRepository = vehicleRepository;
         this.userRepository = userRepository;
+        this.hasValidDocuments = hasValidDocuments;
     }
 
     public List<RentalDto> getRentalHistoryForVehicle(Long vehicleId) {
@@ -49,6 +53,12 @@ public class RentalService {
                 .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+//        Check if user has valid documents
+        Long userId = dto.getUserId();
+        if (!this.hasValidDocuments.check(userId)) {
+            throw new org.springframework.security.access.AccessDeniedException("User does not have valid documents");
+        }
 
         Rental rental = Rental.builder()
                 .vehicle(vehicle)
