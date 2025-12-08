@@ -22,14 +22,17 @@ public class HasValidDocuments {
         if(userId == null) {
             return false;
         }
+        System.out.println("plm1");
 
         try {
             User user = userRepository.findById(userId).orElse(null);
             if(user == null) {
                 return false;
             }
-            return documentsRepository.existsByParent_IdAndCdIsNotNull(userId) &&
-                    documentsRepository.existsByParent_IdAndPcIsNotNull(userId);
+            System.out.println("plm2");
+            System.out.println(userId);
+            System.out.println(documentsRepository.hasValidDocuments(userId));
+            return documentsRepository.hasValidDocuments(userId) > 0;
         } catch (Exception e) {
             return false;
         }

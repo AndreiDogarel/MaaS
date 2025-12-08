@@ -47,4 +47,19 @@ public class Rental {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    public RentalDto toRentalDto(){
+        System.out.println(this.getUser().getId());
+        return RentalDto.builder()
+                .id(this.getId())
+                .vehicleId(this.getVehicle().getId())
+                .userId(this.getUser().getId())
+                .startDate(this.getStartDate())
+                .endDate(this.getEndDate())
+                .status(this.getStatus())
+                .odometerStart(this.getOdometerStart())
+                .odometerEnd(this.getOdometerEnd())
+                .totalPrice(this.getTotalPrice())
+                .build();
+    }
 }

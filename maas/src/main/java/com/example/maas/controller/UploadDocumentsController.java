@@ -33,7 +33,7 @@ public class UploadDocumentsController {
     @Autowired
     private UserRepository userRepository;
 
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER') || hasRole('ADMIN')")
     @PostMapping("/upload")
     public ResponseEntity<?> uploadDocument(
             @RequestParam("documentType") String documentType,

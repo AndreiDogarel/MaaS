@@ -148,19 +148,20 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}/rentals")
-    public List<Rental> getRentalHistory(@PathVariable Long id) {
+    public List<RentalDto> getRentalHistory(@PathVariable Long id) {
         return rentalService.getRentalHistory(id);
     }
 
     @PostMapping("/{id}/rentals")
-    public ResponseEntity<Rental> addRental(@PathVariable Long id, @RequestBody RentalDto rental) {
+    public ResponseEntity<RentalDto> addRental(@PathVariable Long id, @RequestBody RentalDto rental) {
         if (rental == null || rental.getVehicleId() == null || !id.equals(rental.getVehicleId())) {
             return ResponseEntity.badRequest().build();
         }
         try {
-            Rental created = rentalService.createRental(rental);
+            RentalDto created = rentalService.createRental(rental);
             return ResponseEntity.ok(created);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }
