@@ -20,8 +20,11 @@ import { AuthService } from '../../auth/auth.service';
                 </a>
               </div>
               <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <a routerLink="/vehicles" routerLinkActive="border-blue-500 text-gray-900 dark:text-white" [routerLinkActiveOptions]="{exact: false}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 dark:text-gray-300 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-100 transition-colors">
+                <a routerLink="/vehicles" routerLinkActive="border-blue-500 text-gray-900 dark:text-white" [routerLinkActiveOptions]="{exact: true}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 dark:text-gray-300 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-100 transition-colors">
                   Vehicles
+                </a>
+                <a routerLink="/vehicles/new" routerLinkActive="border-blue-500 text-gray-900 dark:text-white" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 dark:text-gray-300 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-100 transition-colors">
+                  Add Vehicle
                 </a>
               </div>
             </div>
