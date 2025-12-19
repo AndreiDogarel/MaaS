@@ -74,10 +74,16 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      console.log('Login data', this.loginForm.value);
-      // Determine implicit login for now until backend verification
-      this.authService.login('dummy-token');
-      this.router.navigate(['/']);
+      this.authService.loginApi(this.loginForm.value).subscribe({
+        next: (token) => {
+          this.authService.login(token);
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          console.error('Login failed', err);
+          alert('Login failed. Please check your credentials.');
+        }
+      });
     }
   }
 }

@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { VehicleService } from './vehicle.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-vehicle-detail',
@@ -62,7 +63,8 @@ export class VehicleDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private vehicleService: VehicleService
+    private vehicleService: VehicleService,
+    public authService: AuthService
   ) { }
 
   setActiveTab(tab: 'overview' | 'maintenance' | 'towing' | 'rentals'): void {
