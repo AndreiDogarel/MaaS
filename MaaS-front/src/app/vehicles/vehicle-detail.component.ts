@@ -58,10 +58,20 @@ export class VehicleDetailComponent implements OnInit {
     totalPrice: null as number | null
   };
 
+  activeTab: 'overview' | 'maintenance' | 'towing' | 'rentals' = 'overview';
+
   constructor(
     private route: ActivatedRoute,
     private vehicleService: VehicleService
-  ) {}
+  ) { }
+
+  setActiveTab(tab: 'overview' | 'maintenance' | 'towing' | 'rentals'): void {
+    this.activeTab = tab;
+  }
+
+  getVehicleImage(vehicle: any): string {
+    return `https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=1200`;
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {

@@ -4,12 +4,35 @@ import { VehicleFormComponent } from './vehicles/vehicle-form.component';
 import { VehicleListComponent } from './vehicles/vehicle-list.component';
 import { VehicleDetailComponent } from './vehicles/vehicle-detail.component';
 import { UploadDocumentComponent } from './documents/upload-document.component';
+import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component';
+import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
+import { HomeComponent } from './home/home.component';
+import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'vehicles', pathMatch: 'full' },
-    { path: 'users', component: UsersListComponent },
-    { path: 'vehicles', component: VehicleListComponent },
-    { path: 'vehicles/new', component: VehicleFormComponent },
-    { path: 'vehicles/:id', component: VehicleDetailComponent },
-    { path: 'documents/upload', component: UploadDocumentComponent }
+    {
+        path: 'auth',
+        component: AuthLayoutComponent,
+        children: [
+            { path: 'login', component: LoginComponent },
+            { path: 'register', component: RegisterComponent },
+            { path: '', redirectTo: 'login', pathMatch: 'full' }
+        ]
+    },
+    {
+        path: '',
+        component: MainLayoutComponent,
+        canActivate: [authGuard],
+        children: [
+            { path: '', component: HomeComponent },
+            { path: 'vehicles', component: VehicleListComponent },
+            { path: 'vehicles/new', component: VehicleFormComponent },
+            { path: 'vehicles/:id', component: VehicleDetailComponent },
+            { path: 'users', component: UsersListComponent },
+            { path: 'documents/upload', component: UploadDocumentComponent }
+        ]
+    },
+    { path: '**', redirectTo: '' }
 ];

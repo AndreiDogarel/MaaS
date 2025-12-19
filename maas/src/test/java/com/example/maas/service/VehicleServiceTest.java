@@ -97,7 +97,7 @@ public class VehicleServiceTest {
         when(jdbcTemplate.query(anyString(), any(Object[].class), any(RowMapper.class)))
                 .thenReturn(Arrays.asList(vehicle1));
 
-        VehicleSearchDto params = new VehicleSearchDto("REG123", null, null, null, null, null, null);
+        VehicleSearchDto params = new VehicleSearchDto("REG123", null, null, null, null, null, null, null);
         List<VehicleDto> result = vehicleService.searchVehicles(params);
 
         assertEquals(1, result.size());
@@ -109,7 +109,7 @@ public class VehicleServiceTest {
         when(jdbcTemplate.query(anyString(), any(Object[].class), any(RowMapper.class)))
                 .thenReturn(Arrays.asList(vehicle1));
 
-        VehicleSearchDto params = new VehicleSearchDto(null, "Toyota", null, null, null, null, null);
+        VehicleSearchDto params = new VehicleSearchDto(null, "Toyota", null, null, null, null, null, null);
         List<VehicleDto> result = vehicleService.searchVehicles(params);
 
         assertEquals(1, result.size());
@@ -121,7 +121,7 @@ public class VehicleServiceTest {
         when(jdbcTemplate.query(anyString(), any(Object[].class), any(RowMapper.class)))
                 .thenReturn(Arrays.asList(vehicle1));
 
-        VehicleSearchDto params = new VehicleSearchDto(null, null, "Camry", null, null, null, null);
+        VehicleSearchDto params = new VehicleSearchDto(null, null, "Camry", null, null, null, null, null);
         List<VehicleDto> result = vehicleService.searchVehicles(params);
 
         assertEquals(1, result.size());
@@ -133,7 +133,7 @@ public class VehicleServiceTest {
         when(jdbcTemplate.query(anyString(), any(Object[].class), any(RowMapper.class)))
                 .thenReturn(Arrays.asList());
 
-        VehicleSearchDto params = new VehicleSearchDto(null, null, null, null, null, null, "NonExistent");
+        VehicleSearchDto params = new VehicleSearchDto(null, null, null, null, null, null, "NonExistent", null);
         List<VehicleDto> result = vehicleService.searchVehicles(params);
 
         assertTrue(result.isEmpty());
