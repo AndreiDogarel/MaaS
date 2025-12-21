@@ -125,7 +125,7 @@
         <div *ngIf="activeTab === 'rentals'" class="animate-fade-in">
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Rental History</h3>
-            <button *ngIf="authService.isAdmin$ | async" (click)="toggleRentalForm()"
+            <button type="button" *ngIf="authService.isAdmin$ | async" (click)="toggleRentalForm()"
               class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
               + Add Rental
             </button>
@@ -189,7 +189,7 @@
         <div *ngIf="activeTab === 'maintenance'" class="animate-fade-in">
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Maintenance History</h3>
-            <button *ngIf="authService.isAdmin$ | async" (click)="toggleMaintenanceForm()"
+            <button type="button" *ngIf="authService.isAdmin$ | async" (click)="toggleMaintenanceForm()"
               class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
               + Add Record
             </button>
@@ -249,7 +249,7 @@
         <div *ngIf="activeTab === 'towing'" class="animate-fade-in">
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Towing History</h3>
-            <button *ngIf="authService.isAdmin$ | async" (click)="toggleTowingForm()"
+            <button type="button" *ngIf="authService.isAdmin$ | async" (click)="toggleTowingForm()"
               class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
               + Add Towing
             </button>

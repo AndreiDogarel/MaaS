@@ -24,14 +24,13 @@ export const routes: Routes = [
     {
         path: '',
         component: MainLayoutComponent,
-        canActivate: [authGuard],
         children: [
             { path: '', component: HomeComponent },
             { path: 'vehicles', component: VehicleListComponent },
-            { path: 'vehicles/new', component: VehicleFormComponent },
+            { path: 'vehicles/new', component: VehicleFormComponent, canActivate: [authGuard] },
             { path: 'vehicles/:id', component: VehicleDetailComponent },
-            { path: 'users', component: UsersListComponent },
-            { path: 'documents/upload', component: UploadDocumentComponent }
+            { path: 'users', component: UsersListComponent, canActivate: [authGuard] },
+            { path: 'documents/upload', component: UploadDocumentComponent, canActivate: [authGuard] }
         ]
     },
     { path: '**', redirectTo: '' }

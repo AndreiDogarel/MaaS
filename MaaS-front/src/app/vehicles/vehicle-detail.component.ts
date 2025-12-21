@@ -411,6 +411,7 @@ export class VehicleDetailComponent implements OnInit {
   }
 
   toggleMaintenanceForm(): void {
+    console.log('Toggling maintenance form');
     this.showMaintenanceForm = !this.showMaintenanceForm;
     if (!this.showMaintenanceForm) {
       this.resetMaintenanceForm();
@@ -420,6 +421,7 @@ export class VehicleDetailComponent implements OnInit {
   }
 
   toggleTowingForm(): void {
+    console.log('Toggling towing form');
     this.showTowingForm = !this.showTowingForm;
     if (!this.showTowingForm) {
       this.resetTowingForm();
@@ -429,6 +431,7 @@ export class VehicleDetailComponent implements OnInit {
   }
 
   toggleRentalForm(): void {
+    console.log('Toggling rental form');
     this.showRentalForm = !this.showRentalForm;
     if (!this.showRentalForm) {
       this.resetRentalForm();
