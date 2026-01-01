@@ -65,4 +65,15 @@ public class AuthController {
     public String test() {
         return "test";
     }
+
+    @GetMapping("/validate")
+    public ResponseEntity<com.example.maas.entities.UserDto> validate() {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User user = (User) authentication.getPrincipal();
+            return ResponseEntity.ok(new com.example.maas.entities.UserDto(user));
+        }
+        return ResponseEntity.status(401).build();
+    }
 }

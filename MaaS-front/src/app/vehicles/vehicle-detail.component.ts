@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { VehicleService } from './vehicle.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-vehicle-detail',
@@ -58,10 +59,21 @@ export class VehicleDetailComponent implements OnInit {
     totalPrice: null as number | null
   };
 
+  activeTab: 'overview' | 'maintenance' | 'towing' | 'rentals' = 'overview';
+
   constructor(
     private route: ActivatedRoute,
-    private vehicleService: VehicleService
-  ) {}
+    private vehicleService: VehicleService,
+    public authService: AuthService
+  ) { }
+
+  setActiveTab(tab: 'overview' | 'maintenance' | 'towing' | 'rentals'): void {
+    this.activeTab = tab;
+  }
+
+  getVehicleImage(vehicle: any): string {
+    return `https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=1200`;
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -399,6 +411,7 @@ export class VehicleDetailComponent implements OnInit {
   }
 
   toggleMaintenanceForm(): void {
+    console.log('Toggling maintenance form');
     this.showMaintenanceForm = !this.showMaintenanceForm;
     if (!this.showMaintenanceForm) {
       this.resetMaintenanceForm();
@@ -408,6 +421,7 @@ export class VehicleDetailComponent implements OnInit {
   }
 
   toggleTowingForm(): void {
+    console.log('Toggling towing form');
     this.showTowingForm = !this.showTowingForm;
     if (!this.showTowingForm) {
       this.resetTowingForm();
@@ -417,6 +431,7 @@ export class VehicleDetailComponent implements OnInit {
   }
 
   toggleRentalForm(): void {
+    console.log('Toggling rental form');
     this.showRentalForm = !this.showRentalForm;
     if (!this.showRentalForm) {
       this.resetRentalForm();

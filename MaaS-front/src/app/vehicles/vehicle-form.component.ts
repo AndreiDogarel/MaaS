@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { VehicleService } from './vehicle.service';
 
 
@@ -16,7 +17,11 @@ export class VehicleFormComponent implements OnInit {
   submitting = false;
   errorMsg = '';
 
-  constructor(private fb: FormBuilder, private api: VehicleService) {}
+  constructor(
+    private fb: FormBuilder,
+    private api: VehicleService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -40,13 +45,7 @@ export class VehicleFormComponent implements OnInit {
     this.api.create(this.form.value).subscribe({
       next: () => {
         this.submitting = false;
-        this.form.reset({
-          year: new Date().getFullYear(),
-          status: 'AVAILABLE',
-          licenseCategory: 'B',
-          mileage: 0,
-          pricePerDay: 0
-        });
+        this.router.navigate(['/vehicles']);
       },
       error: (err) => {
         this.submitting = false;
