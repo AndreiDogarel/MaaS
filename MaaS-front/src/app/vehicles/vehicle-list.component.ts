@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { VehicleService } from './vehicle.service';
 import { Vehicle } from './vehicle.model';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-vehicle-list',
@@ -15,6 +16,7 @@ export class VehicleListComponent implements OnInit {
   vehicles: Vehicle[] = [];
   isLoading = true;
   error: any = null;
+  authService = inject(AuthService);
 
   search = {
     brand: '',
@@ -79,5 +81,22 @@ export class VehicleListComponent implements OnInit {
       'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&q=80&w=800' // Tesla
     ];
     return images[id % images.length];
+  }
+
+  deleteDecommissionedVehicles(): void {
+    if (!confirm('Are you sure you want to delete all decommissioned vehicles? This action cannot be undone.')) {
+      return;
+    }
+
+    this.vehicleService.deleteDecommissionedVehicles().subscribe({
+      next: (response) => {
+        alert('Decommissioned vehicles deleted successfully');
+        this.executeSearch(); // Refresh the list
+      },
+      error: (err) => {
+        console.error('Failed to delete decommissioned vehicles:', err);
+        alert('Failed to delete decommissioned vehicles');
+      }
+    });
   }
 }
