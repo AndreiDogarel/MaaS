@@ -189,4 +189,9 @@ public class VehicleController {
                 .map(existing -> rentalService.deleteRental(rentalId) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build())
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/inspection/overdue")
+    public List<VehicleDto> getVehiclesWithOverdueInspection() {
+        return vehicleService.getVehiclesWithOverdueInspection();
+    }
 }

@@ -27,4 +27,13 @@ public class Maintenance {
 
     @Column(nullable = false)
     private Double cost;
+
+    @Column(name = "is_inspection")
+    private Boolean inspection;
+
+    @Column(name = "next_inspection_date")
+    private LocalDate nextInspectionDate;
+
+    @Column
+    private Long mileage;
 }

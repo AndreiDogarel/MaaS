@@ -4,6 +4,7 @@ import com.example.maas.entities.CreateVehicleRequest;
 import com.example.maas.entities.Vehicle;
 import com.example.maas.entities.VehicleDto;
 import com.example.maas.entities.VehicleSearchDto;
+import com.example.maas.repository.MaintenanceRepository;
 import com.example.maas.repository.VehicleRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,6 +19,7 @@ public class VehicleService {
 
     private final VehicleRepository repo;
     private final JdbcTemplate jdbcTemplate;
+    private final MaintenanceRepository maintenanceRepository;
 
     private final RowMapper<VehicleDto> vehicleRowMapper = (rs, rowNum) -> {
         VehicleDto vehicle = new VehicleDto();
@@ -33,9 +35,10 @@ public class VehicleService {
         return vehicle;
     };
 
-    public VehicleService(VehicleRepository repo, JdbcTemplate jdbcTemplate) {
+    public VehicleService(VehicleRepository repo, JdbcTemplate jdbcTemplate, MaintenanceRepository maintenanceRepository) {
         this.repo = repo;
         this.jdbcTemplate = jdbcTemplate;
+        this.maintenanceRepository = maintenanceRepository;
     }
 
     public List<VehicleDto> getAllVehicles() {
@@ -116,5 +119,15 @@ public class VehicleService {
         }
 
         return jdbcTemplate.query(sql.toString(), args.toArray(), vehicleRowMapper);
+    }
+
+    public List<VehicleDto> getVehiclesWithOverdueInspection() {
+        List<Long> ids = maintenanceRepository.findVehicleIdsWithOverdueInspection();
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+        String inSql = ids.stream().map(id -> "?").reduce((a, b) -> a + "," + b).orElse("?");
+        String sql = "SELECT * FROM vehicles WHERE id IN (" + inSql + ")";
+        return jdbcTemplate.query(sql, ids.toArray(), vehicleRowMapper);
     }
 }

@@ -15,11 +15,17 @@ public class MaintenanceDto { @Column(nullable = false)
     private String description;
     private Double cost;
     private Long vehicleId;
+    private Boolean inspection;
+    private LocalDate nextInspectionDate;
+    private Long mileage;
 
     public MaintenanceDto(Maintenance maintenance) {
         this.date = maintenance.getDate();
         this.type = maintenance.getType();
         this.description = maintenance.getDescription();
         this.cost = maintenance.getCost();
+        this.inspection = maintenance.getInspection();
+        this.nextInspectionDate = maintenance.getNextInspectionDate();
+        this.mileage = maintenance.getMileage();
     }
 }
