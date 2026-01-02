@@ -1,0 +1,63 @@
+<!-- file: `MaaS-front/src/app/reports/monthly-reports.component.html` -->
+<div style="max-width:800px;margin:1rem auto;padding:1rem;border:1px solid #ddd;border-radius:6px;">
+  <h3>Monthly Report Tester</h3>
+
+  <div style="margin-bottom:0.5rem;">
+    <label>Year:
+      <input type="number" min="2000" [(ngModel)]="year" [placeholder]="currentYear" />
+    </label>
+    <label style="margin-left:12px">Month:
+      <input type="number" min="1" max="12" [(ngModel)]="month" [placeholder]="currentMonth" />
+    </label>
+  </div>
+
+  <div style="margin-bottom:0.5rem;">
+    <label>Bearer token (optional)</label><br />
+    <input type="text" [(ngModel)]="token" style="width:100%;" placeholder="paste token (if endpoint secured)" />
+  </div>
+
+  <div style="margin-bottom:0.5rem;">
+    <button (click)="loadReport()">{{ status === 'Loading...' ? 'Loading...' : 'Load Report' }}</button>
+    <span style="margin-left:12px;color:#666">{{ status }}</span>
+  </div>
+
+  <hr />
+
+  <div *ngIf="report">
+    <h4>Summary</h4>
+    <table style="width:100%;border-collapse:collapse">
+      <tbody>
+      <tr><th style="text-align:left;padding:6px;border:1px solid #ddd">Year/Month</th><td style="padding:6px;border:1px solid #ddd">{{ report.year }} / {{ report.month }}</td></tr>
+      <tr><th style="text-align:left;padding:6px;border:1px solid #ddd">Available Vehicles</th><td style="padding:6px;border:1px solid #ddd">{{ report.availableVehicles }}</td></tr>
+      <tr><th style="text-align:left;padding:6px;border:1px solid #ddd">Total Service Cost</th><td style="padding:6px;border:1px solid #ddd">{{ toNumber(report.totalServiceCost) | number:'1.2-2' }}</td></tr>
+      </tbody>
+    </table>
+
+    <div *ngFor="let cfg of listsConfig" style="margin-top:12px;">
+      <ng-container *ngIf="report[cfg.key]?.length; else noneTpl">
+        <h4>{{ cfg.title }}</h4>
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+          <tr>
+            <th style="padding:6px;border:1px solid #ddd;text-align:left">Key</th>
+            <th style="padding:6px;border:1px solid #ddd;text-align:left">Count</th>
+            <th style="padding:6px;border:1px solid #ddd;text-align:left">Value</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let item of report[cfg.key]">
+            <td style="padding:6px;border:1px solid #ddd">{{ item.key || 'UNKNOWN' }}</td>
+            <td style="padding:6px;border:1px solid #ddd">{{ item.count || 0 }}</td>
+            <td style="padding:6px;border:1px solid #ddd">{{ toNumber(item.value) | number:'1.2-2' }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </ng-container>
+      <ng-template #noneTpl>
+        <h4>{{ cfg.title }} (none)</h4>
+      </ng-template>
+    </div>
+  </div>
+
+  <pre *ngIf="error" style="white-space:pre-wrap;color:red;margin-top:12px">{{ error }}</pre>
+</div>
