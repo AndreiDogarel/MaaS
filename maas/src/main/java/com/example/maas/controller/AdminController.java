@@ -10,6 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.example.maas.repository.VehicleRepository;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -29,36 +32,23 @@ public class AdminController {
 
     @DeleteMapping("/deleteUser/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String deleteUser(@PathVariable("id") Long id) {
+    public Map<String, String> deleteUser(@PathVariable("id") Long id) {
         userRepository.deleteById(id);
-        return "User deleted successfully";
+        return Map.of("message", "User deleted successfully");
     }
 
-    @PutMapping("/updateUserRole/{id}/{role}")
+    @PutMapping("/updateUser/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String updateUserRole(@PathVariable Long id, @PathVariable Role role) {
+    public UserDetailsDto updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
         var user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setRole(roleRepository.getByName(role));
+        if (request.username() != null && !request.username().isBlank()) {
+            user.setUsername(request.username());
+        }
+        if (request.role() != null) {
+            user.setRole(roleRepository.getByName(Role.valueOf(request.role())));
+        }
         userRepository.save(user);
-        return "User role updated successfully";
-    }
-
-    @PutMapping("/resetPassword/{id}/{newPassword}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String resetPassword(@PathVariable Long id, @PathVariable String newPassword) {
-        var user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-        return "Password reset successfully";
-    }
-
-    @PutMapping("/updateUsername/{id}/{newUsername}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String updateUsername(@PathVariable Long id, @PathVariable String newUsername) {
-        var user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        user.setUsername(newUsername);
-        userRepository.save(user);
-        return "Username updated successfully";
+        return new UserDetailsDto(user.getId(), user.getUsername(), user.getRole().getName().toString());
     }
 
     @DeleteMapping("/deleteDecommissionedVehicles")
@@ -67,4 +57,22 @@ public class AdminController {
         vehicleRepository.deleteDecommissionedVehicles();
         return "Decommissioned vehicles deleted successfully";
     }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserDetailsDto> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(u -> new UserDetailsDto(
+                        u.getId(),
+                        u.getUsername(),
+                        u.getRole().getName().toString()
+                ))
+                .toList();
+    }
+
+    private record UpdateUserRequest(String username, String role) {}
+    private record UserDetailsDto(Long id, String username, String role) {}
+
+
 }
