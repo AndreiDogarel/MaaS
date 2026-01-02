@@ -1,240 +1,502 @@
-<div *ngIf="isLoading" class="loading-message">
-  Loading vehicle details...
+<div *ngIf="isLoading" class="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
 </div>
 
-<div *ngIf="error" class="error-message">
-  Error: {{ error }}
+<div *ngIf="error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+            clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-red-700 dark:text-red-200">
+          {{ error }}
+        </p>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div *ngIf="!isLoading && vehicle" class="vehicle-detail-container">
-  <h1>{{ vehicle.brand }} {{ vehicle.model }}</h1>
-  
-  <section class="vehicle-info">
-    <h2>Vehicle Information</h2>
-    <table>
-      <tr>
-        <td><strong>Registration Number:</strong></td>
-        <td>{{ vehicle.registrationNumber }}</td>
-      </tr>
-      <tr>
-        <td><strong>Year:</strong></td>
-        <td>{{ vehicle.year }}</td>
-      </tr>
-      <tr>
-        <td><strong>Mileage:</strong></td>
-        <td>{{ vehicle.mileage | number }} km</td>
-      </tr>
-      <tr>
-        <td><strong>License Category:</strong></td>
-        <td>{{ vehicle.licenseCategory }}</td>
-      </tr>
-      <tr>
-        <td><strong>Status:</strong></td>
-        <td [class.available]="vehicle.status === 'AVAILABLE'">{{ vehicle.status }}</td>
-      </tr>
-      <tr>
-        <td><strong>Price per day:</strong></td>
-        <td>{{ vehicle.pricePerDay | number:'1.2-2' }}</td>
-      </tr>
-    </table>
-  </section>
-
-  <section class="rental-history">
-    <div class="section-header">
-      <h2>Rental History</h2>
-      <button (click)="toggleRentalForm()" class="add-button">
-        {{ showRentalForm ? 'Cancel' : '+ Add Rental' }}
-      </button>
+<div *ngIf="!isLoading && vehicle" class="min-h-screen bg-gray-50 dark:bg-gray-900 pb-12">
+  <!-- Hero Section -->
+  <div class="relative bg-gray-900 h-64 sm:h-80 lg:h-96">
+    <div class="absolute inset-0">
+      <img [src]="getVehicleImage(vehicle)" class="w-full h-full object-cover opacity-60" alt="Vehicle Image">
+      <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
     </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-end pb-8">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            {{ vehicle.brand }} {{ vehicle.model }}
+          </h1>
+          <div class="mt-2 flex items-center space-x-4 text-gray-300">
+            <span
+              class="px-2 py-1 rounded bg-white/10 text-white text-xs font-semibold backdrop-blur-sm border border-white/10">
+              {{ vehicle.year }}
+            </span>
+            <span class="flex items-center text-sm">
+              <span class="mr-1">🚗</span> Class {{ vehicle.licenseCategory }}
+            </span>
+            <span class="flex items-center text-sm">
+              <span class="mr-1">📍</span> {{ vehicle.mileage | number }} km
+            </span>
+          </div>
+        </div>
+        <div class="mt-4 md:mt-0 flex items-center space-x-4">
+          <span
+            [class]="'px-3 py-1 text-sm font-semibold rounded-full ' + (vehicle.status === 'AVAILABLE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')">
+            {{ vehicle.status }}
+          </span>
+          <div class="text-right">
+            <p class="text-2xl font-bold text-white">{{ vehicle.pricePerDay | number:'1.2-2' }}€</p>
+            <p class="text-xs text-gray-400">per day</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <form *ngIf="showRentalForm" (ngSubmit)="submitRentalForm()" class="add-form">
-      <div class="form-group">
-        <label for="rental-start">Start date:</label>
-        <input id="rental-start" type="date" [(ngModel)]="rentalForm.startDate" name="startDate" required>
+  <!-- Main Content with Tabs -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden min-h-[500px]">
+
+      <!-- Tabs Navigation -->
+      <div class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <nav class="-mb-px flex space-x-8 px-6 overflow-x-auto" aria-label="Tabs">
+          <button
+            [class]="activeTab === 'overview' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'"
+            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            (click)="setActiveTab('overview')">
+            Overview
+          </button>
+          <button
+            [class]="activeTab === 'rentals' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'"
+            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            (click)="setActiveTab('rentals')">
+            Rental History
+          </button>
+          <button
+            [class]="activeTab === 'maintenance' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'"
+            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            (click)="setActiveTab('maintenance')">
+            Maintenance
+          </button>
+          <button
+            [class]="activeTab === 'towing' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'"
+            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            (click)="setActiveTab('towing')">
+            Towing
+          </button>
+        </nav>
       </div>
-      <div class="form-group">
-        <label for="rental-end">End date:</label>
-        <input id="rental-end" type="date" [(ngModel)]="rentalForm.endDate" name="endDate">
+
+      <!-- Tab Contents -->
+      <div class="p-6">
+
+        <!-- Overview Tab -->
+        <div *ngIf="activeTab === 'overview'" class="animate-fade-in">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Vehicle Details</h3>
+          <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+            <div class="sm:col-span-1">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Registration Number</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.registrationNumber }}</dd>
+            </div>
+            <div class="sm:col-span-1">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Brand & Model</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.brand }} {{ vehicle.model }}</dd>
+            </div>
+            <div class="sm:col-span-1">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Manufacture Year</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.year }}</dd>
+            </div>
+            <div class="sm:col-span-1">
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Current Mileage</dt>
+              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.mileage | number }} km</dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Rentals Tab -->
+        <div *ngIf="activeTab === 'rentals'" class="animate-fade-in">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Rental History</h3>
+            <button type="button" *ngIf="authService.isAdmin$ | async" (click)="toggleRentalForm()"
+              class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+              + Add Rental
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-50 dark:bg-gray-900/50">
+                <tr>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Start</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    End</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Status</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Price</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tr *ngFor="let record of rentalHistory">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ record.startDate |
+                    date:'mediumDate' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ record.endDate ?
+                    (record.endDate | date:'mediumDate') : '-' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <span
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      {{ record.status }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ record.totalPrice
+                    != null ? (record.totalPrice | number:'1.2-2') + ' €' : '-' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <ng-container *ngIf="authService.isAdmin$ | async">
+                      <button class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3"
+                        (click)="beginEditRental(record)">Edit</button>
+                      <button class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                        (click)="deleteRental(record)">Delete</button>
+                    </ng-container>
+                  </td>
+                </tr>
+                <tr *ngIf="rentalHistory.length === 0">
+                  <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                    No rental history available for this vehicle.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Maintenance Tab -->
+        <div *ngIf="activeTab === 'maintenance'" class="animate-fade-in">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Maintenance History</h3>
+            <button type="button" *ngIf="authService.isAdmin$ | async" (click)="toggleMaintenanceForm()"
+              class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+              + Add Record
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-50 dark:bg-gray-900/50">
+                <tr>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Date</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Type</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Description</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Cost</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tr *ngFor="let record of maintenanceHistory">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ record.date |
+                    date:'mediumDate' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-medium">{{
+                    record.type }}</td>
+                  <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{{ record.description
+                    }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ record.cost |
+                    number:'1.2-2' }} €</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <ng-container *ngIf="authService.isAdmin$ | async">
+                      <button class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3"
+                        (click)="beginEditMaintenance(record)">Edit</button>
+                      <button class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                        (click)="deleteMaintenance(record)">Delete</button>
+                    </ng-container>
+                  </td>
+                </tr>
+                <tr *ngIf="maintenanceHistory.length === 0">
+                  <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                    No maintenance records found.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Towing Tab -->
+        <div *ngIf="activeTab === 'towing'" class="animate-fade-in">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Towing History</h3>
+            <button type="button" *ngIf="authService.isAdmin$ | async" (click)="toggleTowingForm()"
+              class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+              + Add Towing
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-50 dark:bg-gray-900/50">
+                <tr>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Date</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Location</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Reason</th>
+                  <th scope="col"
+                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Actions</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tr *ngFor="let record of towingHistory">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ record.date |
+                    date:'mediumDate' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ record.location }}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{{ record.reason }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <ng-container *ngIf="authService.isAdmin$ | async">
+                      <button class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3"
+                        (click)="beginEditTowing(record)">Edit</button>
+                      <button class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                        (click)="deleteTowing(record)">Delete</button>
+                    </ng-container>
+                  </td>
+                </tr>
+                <tr *ngIf="towingHistory.length === 0">
+                  <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                    No towing records found.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
-      <div class="form-group">
-        <label for="rental-status">Status:</label>
-        <input id="rental-status" type="text" [(ngModel)]="rentalForm.status" name="status" placeholder="e.g., ACTIVE, COMPLETED" required>
+    </div>
+  </main>
+</div>
+
+<!-- Maintenance Modal -->
+<!-- Maintenance Modal -->
+<div *ngIf="showMaintenanceForm" class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title"
+  role="dialog" aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" aria-hidden="true"
+      (click)="cancelMaintenanceEdit()"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div
+      class="relative z-10 inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+              {{ isEditingMaintenance ? 'Edit Maintenance Record' : 'Add Maintenance Record' }}
+            </h3>
+            <div class="mt-4 space-y-4">
+              <div>
+                <label for="modal-maintenance-date"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+                <input type="date" id="modal-maintenance-date" [(ngModel)]="maintenanceForm.date"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+              </div>
+              <div>
+                <label for="modal-maintenance-type"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
+                <input type="text" id="modal-maintenance-type" [(ngModel)]="maintenanceForm.type"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+              </div>
+              <div>
+                <label for="modal-maintenance-description"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                <textarea id="modal-maintenance-description" [(ngModel)]="maintenanceForm.description" rows="3"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm"></textarea>
+              </div>
+              <div>
+                <label for="modal-maintenance-cost"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cost</label>
+                <input type="number" id="modal-maintenance-cost" [(ngModel)]="maintenanceForm.cost"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="odometer-start">Odometer start:</label>
-        <input id="odometer-start" type="number" [(ngModel)]="rentalForm.odometerStart" name="odometerStart" placeholder="Start km">
-      </div>
-      <div class="form-group">
-        <label for="odometer-end">Odometer end:</label>
-        <input id="odometer-end" type="number" [(ngModel)]="rentalForm.odometerEnd" name="odometerEnd" placeholder="End km">
-      </div>
-      <div class="form-group">
-        <label for="total-price">Total price:</label>
-        <input id="total-price" type="number" step="0.01" [(ngModel)]="rentalForm.totalPrice" name="totalPrice" placeholder="Total price">
-      </div>
-      <div class="form-actions">
-        <button type="submit" [disabled]="rentalFormSubmitting">
-          {{ rentalFormSubmitting ? 'Submitting...' : (isEditingRental ? 'Update Rental' : 'Add Rental') }}
+      <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" (click)="submitMaintenanceForm()" [disabled]="maintenanceFormSubmitting"
+          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+          {{ maintenanceFormSubmitting ? 'Saving...' : 'Save' }}
         </button>
-        <button type="button" (click)="cancelRentalEdit()" class="cancel-button">Cancel</button>
-      </div>
-    </form>
-
-    <div *ngIf="rentalHistory.length > 0">
-      <table class="history-table">
-        <thead>
-          <tr>
-            <th>Start date</th>
-            <th>End date</th>
-            <th>Status</th>
-            <th>Odometer start</th>
-            <th>Odometer end</th>
-            <th>Total price</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let record of rentalHistory">
-            <td>{{ record.startDate | date:'mediumDate' }}</td>
-            <td>{{ record.endDate ? (record.endDate | date:'mediumDate') : '-' }}</td>
-            <td>{{ record.status }}</td>
-            <td>{{ record.odometerStart ?? '-' }}</td>
-            <td>{{ record.odometerEnd ?? '-' }}</td>
-            <td>{{ record.totalPrice != null ? (record.totalPrice | number:'1.2-2') : '-' }}</td>
-            <td>
-              <button type="button" class="action-button" (click)="beginEditRental(record)">Edit</button>
-              <button type="button" class="action-button danger-button" (click)="deleteRental(record)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div *ngIf="rentalHistory.length === 0" class="no-data-message">
-      No rental records found.
-    </div>
-  </section>
-
-  <section class="maintenance-history">
-    <div class="section-header">
-      <h2>Maintenance History</h2>
-      <button (click)="toggleMaintenanceForm()" class="add-button">+ Add Maintenance</button>
-    </div>
-
-    <form *ngIf="showMaintenanceForm" (ngSubmit)="submitMaintenanceForm()" class="add-form">
-      <div class="form-group">
-        <label for="maintenance-date">Date:</label>
-        <input id="maintenance-date" type="date" [(ngModel)]="maintenanceForm.date" name="date" required>
-      </div>
-      <div class="form-group">
-        <label for="maintenance-type">Type:</label>
-        <input id="maintenance-type" type="text" [(ngModel)]="maintenanceForm.type" name="type" placeholder="e.g., Oil Change, Tire Rotation" required>
-      </div>
-      <div class="form-group">
-        <label for="maintenance-description">Description:</label>
-        <textarea id="maintenance-description" [(ngModel)]="maintenanceForm.description" name="description" placeholder="Additional details"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="maintenance-cost">Cost:</label>
-        <input id="maintenance-cost" type="number" [(ngModel)]="maintenanceForm.cost" name="cost" placeholder="Cost in EUR">
-      </div>
-      <div class="form-actions">
-        <button type="submit" [disabled]="maintenanceFormSubmitting">
-          {{ maintenanceFormSubmitting ? 'Submitting...' : (isEditingMaintenance ? 'Update Maintenance' : 'Add Maintenance') }}
+        <button type="button" (click)="cancelMaintenanceEdit()"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          Cancel
         </button>
-        <button type="button" (click)="cancelMaintenanceEdit()" class="cancel-button">Cancel</button>
       </div>
-    </form>
-
-    <div *ngIf="maintenanceHistory.length > 0">
-      <table class="history-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Cost</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let record of maintenanceHistory">
-            <td>{{ record.date | date: 'short' }}</td>
-            <td>{{ record.type }}</td>
-            <td>{{ record.description }}</td>
-            <td>{{ record.cost | number:'1.2-2' }}</td>
-            <td>
-              <button type="button" class="action-button" (click)="beginEditMaintenance(record)">Edit</button>
-              <button type="button" class="action-button danger-button" (click)="deleteMaintenance(record)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-    <div *ngIf="maintenanceHistory.length === 0" class="no-data-message">
-      No maintenance records found.
-    </div>
-  </section>
+  </div>
+</div>
 
-  <section class="towing-history">
-    <div class="section-header">
-      <h2>Towing History</h2>
-      <button (click)="toggleTowingForm()" class="add-button">+ Add Towing</button>
-    </div>
-
-    <form *ngIf="showTowingForm" (ngSubmit)="submitTowingForm()" class="add-form">
-      <div class="form-group">
-        <label for="towing-date">Date:</label>
-        <input id="towing-date" type="date" [(ngModel)]="towingForm.date" name="date" required>
+<!-- Rental Modal -->
+<div *ngIf="showRentalForm" class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+  aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" aria-hidden="true"
+      (click)="cancelRentalEdit()"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div
+      class="relative z-10 inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+              {{ isEditingRental ? 'Edit Rental Record' : 'Add Rental Record' }}
+            </h3>
+            <div class="mt-4 space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="modal-rental-start"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
+                  <input type="date" id="modal-rental-start" [(ngModel)]="rentalForm.startDate"
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                  <label for="modal-rental-end" class="block text-sm font-medium text-gray-700 dark:text-gray-300">End
+                    Date</label>
+                  <input type="date" id="modal-rental-end" [(ngModel)]="rentalForm.endDate"
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+              </div>
+              <div>
+                <label for="modal-rental-status"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                <select id="modal-rental-status" [(ngModel)]="rentalForm.status"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                  <option value="ACTIVE">Active</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="CANCELED">Canceled</option>
+                  <option value="RESERVED">Reserved</option>
+                </select>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="modal-odometer-start"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Odometer Start</label>
+                  <input type="number" id="modal-odometer-start" [(ngModel)]="rentalForm.odometerStart"
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+                <div>
+                  <label for="modal-odometer-end"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Odometer End</label>
+                  <input type="number" id="modal-odometer-end" [(ngModel)]="rentalForm.odometerEnd"
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+                </div>
+              </div>
+              <div>
+                <label for="modal-total-price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Total
+                  Price</label>
+                <input type="number" id="modal-total-price" [(ngModel)]="rentalForm.totalPrice"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="towing-location">Location:</label>
-        <input id="towing-location" type="text" [(ngModel)]="towingForm.location" name="location" placeholder="Where the vehicle was towed from/to" required>
-      </div>
-      <div class="form-group">
-        <label for="towing-reason">Reason:</label>
-        <textarea id="towing-reason" [(ngModel)]="towingForm.reason" name="reason" placeholder="Why the vehicle was towed"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="towing-duration">Duration (minutes):</label>
-        <input id="towing-duration" type="number" [(ngModel)]="towingForm.duration" name="duration" placeholder="Duration in minutes">
-      </div>
-      <div class="form-actions">
-        <button type="submit" [disabled]="towingFormSubmitting">
-          {{ towingFormSubmitting ? 'Submitting...' : (isEditingTowing ? 'Update Towing' : 'Add Towing') }}
+      <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" (click)="submitRentalForm()" [disabled]="rentalFormSubmitting"
+          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+          {{ rentalFormSubmitting ? 'Saving...' : 'Save' }}
         </button>
-        <button type="button" (click)="cancelTowingEdit()" class="cancel-button">Cancel</button>
+        <button type="button" (click)="cancelRentalEdit()"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          Cancel
+        </button>
       </div>
-    </form>
-
-    <div *ngIf="towingHistory.length > 0">
-      <table class="history-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Location</th>
-            <th>Reason</th>
-            <th>Duration</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let record of towingHistory">
-            <td>{{ record.date | date: 'short' }}</td>
-            <td>{{ record.location }}</td>
-            <td>{{ record.reason }}</td>
-            <td>{{ record.duration }} minutes</td>
-            <td>
-              <button type="button" class="action-button" (click)="beginEditTowing(record)">Edit</button>
-              <button type="button" class="action-button danger-button" (click)="deleteTowing(record)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
-    <div *ngIf="towingHistory.length === 0" class="no-data-message">
-      No towing records found.
-    </div>
-  </section>
+  </div>
+</div>
 
-  <a routerLink="/vehicles" class="back-link">← Back to Vehicle List</a>
+<!-- Towing Modal -->
+<div *ngIf="showTowingForm" class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+  aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" aria-hidden="true"
+      (click)="cancelTowingEdit()"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div
+      class="relative z-10 inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+              {{ isEditingTowing ? 'Edit Towing Record' : 'Add Towing Record' }}
+            </h3>
+            <div class="mt-4 space-y-4">
+              <div>
+                <label for="modal-towing-date"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
+                <input type="date" id="modal-towing-date" [(ngModel)]="towingForm.date"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+              </div>
+              <div>
+                <label for="modal-towing-location"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+                <input type="text" id="modal-towing-location" [(ngModel)]="towingForm.location"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+              </div>
+              <div>
+                <label for="modal-towing-reason"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300">Reason</label>
+                <textarea id="modal-towing-reason" [(ngModel)]="towingForm.reason" rows="3"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm"></textarea>
+              </div>
+              <div>
+                <label for="modal-towing-duration"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300">Duration (minutes)</label>
+                <input type="number" id="modal-towing-duration" [(ngModel)]="towingForm.duration"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" (click)="submitTowingForm()" [disabled]="towingFormSubmitting"
+          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+          {{ towingFormSubmitting ? 'Saving...' : 'Save' }}
+        </button>
+        <button type="button" (click)="cancelTowingEdit()"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

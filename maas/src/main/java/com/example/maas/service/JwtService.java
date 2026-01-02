@@ -20,7 +20,11 @@ public class JwtService {
     private static final String SECRET_KEY = "3vEryS3cr3tKeyThatShouldBeAtLeast64CharsLongForHS256Algorithm!";
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+        if (userDetails instanceof com.example.maas.entities.User) {
+            extraClaims.put("role", ((com.example.maas.entities.User) userDetails).getRole().getName());
+        }
+        return generateToken(extraClaims, userDetails);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
