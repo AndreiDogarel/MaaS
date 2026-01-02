@@ -62,5 +62,21 @@ export class RegisterComponent {
       // TODO: Call register API
       this.router.navigate(['/auth/login']);
     }
+    if (this.registerForm.valid) {
+      const payload = {
+        ...this.registerForm.value,
+        role: 'CUSTOMER'
+      };
+      this.authService.registerApio(payload).subscribe({
+        next: (token) => {
+          this.authService.login(token);
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          console.error('Register failed', err);
+          alert('Register failed. Please check your credentials.');
+        }
+      });
+    }
   }
 }
