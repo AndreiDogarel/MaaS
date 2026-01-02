@@ -10,6 +10,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { HomeComponent } from './home/home.component';
 import { authGuard } from './auth/auth.guard';
+import {MonthlyReportsComponent} from "./reports/monthly-reports.component";
 
 export const routes: Routes = [
     {
@@ -30,7 +31,8 @@ export const routes: Routes = [
             { path: 'vehicles/new', component: VehicleFormComponent, canActivate: [authGuard] },
             { path: 'vehicles/:id', component: VehicleDetailComponent },
             { path: 'users', component: UsersListComponent, canActivate: [authGuard] },
-            { path: 'documents/upload', component: UploadDocumentComponent, canActivate: [authGuard] }
+            { path: 'documents/upload', component: UploadDocumentComponent, canActivate: [authGuard] },
+            { path: 'reports/monthly', component: MonthlyReportsComponent, canActivate: [authGuard] }
         ]
     },
     { path: '**', redirectTo: '' }

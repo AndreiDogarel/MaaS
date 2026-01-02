@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-monthly-reports',
@@ -13,7 +12,6 @@ import { Observable } from 'rxjs';
 export class MonthlyReportsComponent implements OnInit {
   year = '';
   month = '';
-  token = '';
   status = '';
   report: any = null;
   error: string | null = null;
@@ -32,13 +30,19 @@ export class MonthlyReportsComponent implements OnInit {
     const now = new Date();
     this.currentYear = String(now.getFullYear());
     this.currentMonth = String(now.getMonth() + 1);
+
+    // Optional: Default to current date
+    this.year = this.currentYear;
+    this.month = this.currentMonth;
   }
 
   private buildUrl(): string {
     const params = new URLSearchParams();
     if (this.year) params.set('year', this.year);
     if (this.month) params.set('month', this.month);
-    return '/api/reports/monthly-reports' + (params.toString() ? '?' + params.toString() : '');
+
+    // Points to the Spring Boot backend
+    return 'http://localhost:8080/api/reports/monthly-reports' + (params.toString() ? '?' + params.toString() : '');
   }
 
   loadReport(): void {
@@ -47,9 +51,13 @@ export class MonthlyReportsComponent implements OnInit {
     this.error = null;
 
     const url = this.buildUrl();
-    let headers = new HttpHeaders({ Accept: 'application/json' });
-    if (this.token && this.token.trim()) {
-      headers = headers.set('Authorization', 'Bearer ' + this.token.trim());
+
+    // Automatically retrieve the token from localStorage
+    const savedToken = localStorage.getItem('token');
+
+    let headers = new HttpHeaders({ 'Accept': 'application/json' });
+    if (savedToken) {
+      headers = headers.set('Authorization', 'Bearer ' + savedToken.trim());
     }
 
     this.http.get<any>(url, { headers }).subscribe({
@@ -59,6 +67,7 @@ export class MonthlyReportsComponent implements OnInit {
       },
       error: err => {
         this.status = `Error: ${err.status || 'fetch'}`;
+        // If 403, it might mean the token in localStorage is expired or missing
         this.error = (err.error && typeof err.error === 'string') ? err.error : JSON.stringify(err, null, 2);
       }
     });

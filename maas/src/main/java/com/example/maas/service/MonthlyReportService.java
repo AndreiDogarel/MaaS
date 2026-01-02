@@ -38,14 +38,15 @@ public class MonthlyReportService {
 
         // Total Service Cost
         Number totalServiceCostNumber = jdbc.queryForObject(
-                "SELECT COALESCE(SUM(cost), 0) FROM service_record WHERE date BETWEEN ? AND ?",
+                "SELECT COALESCE(SUM(cost), 0) FROM maintenances WHERE date BETWEEN ? AND ?",
                 new Object[]{sqlStartDate, sqlEndDate},
                 Number.class
         );
         double totalServiceCost = (totalServiceCostNumber != null) ? totalServiceCostNumber.doubleValue() : 0.0;
 
         List<ReportItem> byType = jdbc.queryForList(
-                        "SELECT type AS type, COUNT(*) AS cnt FROM vehicles GROUP BY type"
+                        // use license_category aliased as type so mapping code stays the same
+                        "SELECT license_category AS type, COUNT(*) AS cnt FROM vehicles GROUP BY license_category"
                 )
                 .stream()
                 .map(row -> {
@@ -56,9 +57,10 @@ public class MonthlyReportService {
                 .collect(Collectors.toList());
 
         List<ReportItem> serviceByType = jdbc.queryForList(
-                        "SELECT v.type AS type, COALESCE(SUM(s.cost), 0) AS value " +
-                                "FROM service_record s JOIN vehicles v ON s.vehicle_id = v.id " +
-                                "WHERE s.date BETWEEN ? AND ? GROUP BY v.type",
+                        // group by license_category on vehicles and alias as type
+                        "SELECT v.license_category AS type, COALESCE(SUM(s.cost), 0) AS value " +
+                                "FROM maintenances s JOIN vehicles v ON s.vehicle_id = v.id " +
+                                "WHERE s.date BETWEEN ? AND ? GROUP BY v.license_category",
                         sqlStartDate, sqlEndDate
                 )
                 .stream()
@@ -74,7 +76,7 @@ public class MonthlyReportService {
 
         List<ReportItem> topServiceVehicles = jdbc.queryForList(
                         "SELECT v.id AS id, v.registration_number AS label, COALESCE(SUM(s.cost), 0) AS value " +
-                                "FROM service_record s JOIN vehicles v ON s.vehicle_id = v.id " +
+                                "FROM maintenances s JOIN vehicles v ON s.vehicle_id = v.id " +
                                 "WHERE s.date BETWEEN ? AND ? " +
                                 "GROUP BY v.id, v.registration_number " +
                                 "ORDER BY value DESC " +
