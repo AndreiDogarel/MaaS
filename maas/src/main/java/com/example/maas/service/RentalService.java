@@ -99,7 +99,7 @@ public class RentalService {
         if (dto.getEndDate() != null) {
             rental.setEndDate(dto.getEndDate());
         }
-        if (dto.getStatus() != null && !dto.getStatus().isBlank()) {
+        if (dto.getStatus() != null) {
             rental.setStatus(dto.getStatus());
         }
         if (dto.getOdometerStart() != null) {
