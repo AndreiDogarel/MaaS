@@ -3,6 +3,7 @@ package com.example.maas.entities;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -12,8 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 public class RentalUpdateDto {
 
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String status;
     private Long odometerStart;
     private Long odometerEnd;

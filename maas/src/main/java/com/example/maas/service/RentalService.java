@@ -1,13 +1,11 @@
 package com.example.maas.service;
 
-import com.example.maas.entities.Rental;
-import com.example.maas.entities.RentalDto;
-import com.example.maas.entities.RentalUpdateDto;
-import com.example.maas.entities.Vehicle;
-import com.example.maas.entities.User;
+import com.example.maas.entities.*;
 import com.example.maas.repository.RentalRepository;
 import com.example.maas.repository.VehicleRepository;
 import com.example.maas.repository.UserRepository;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -35,47 +33,60 @@ public class RentalService {
         this.hasValidDocuments = hasValidDocuments;
     }
 
-//    public List<RentalDto> getRentalHistoryForVehicle(Long vehicleId) {
-//        return rentalRepository.findByVehicleIdOrderByStartDateDesc(vehicleId)
-//                .stream()
-//                .map(this::toDto)
-//                .toList();
-//    }
-
-    public List<RentalDto> getRentalHistory(Long vehicleId) {
-        return rentalRepository.findByVehicleIdOrderByStartDateDesc(vehicleId).stream().map(a -> a.toRentalDto()).collect(Collectors.toList());
+    public List<Rental> getRentalHistory(Long vehicleId) {
+        return rentalRepository.findByVehicleIdOrderByStartDateDesc(vehicleId).stream().collect(Collectors.toList());
     }
 
     public Optional<Rental> getRentalById(Long rentalId) {
         return rentalRepository.findById(rentalId);
     }
 
-    public RentalDto createRental(RentalDto dto) {
-        Vehicle vehicle = vehicleRepository.findById(dto.getVehicleId())
-                .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public RentalDto createRental(Long vehicleId, RentalDto dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("Rental payload is required");
+        }
 
-//        Check if user has valid documents
-        Long userId = userRepository.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
-        if (!this.hasValidDocuments.check(userId)) {
-            throw new org.springframework.security.access.AccessDeniedException("User does not have valid documents");
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new org.springframework.security.access.AccessDeniedException("Authentication required");
+        }
+
+        User actingUser;
+        if (authentication.getPrincipal() instanceof User) {
+            actingUser = (User) authentication.getPrincipal();
+        } else {
+            actingUser = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        }
+
+        boolean isAdmin = actingUser.getRole() != null
+                && actingUser.getRole().getName() == Role.ADMIN;
+
+        boolean isCustomer = actingUser.getRole() != null
+                && actingUser.getRole().getName() == Role.CUSTOMER;
+
+        if (isCustomer && !hasValidDocuments.check(actingUser.getId())) {
+            throw new AccessDeniedException("User does not have valid documents");
         }
 
         Rental rental = Rental.builder()
                 .vehicle(vehicle)
-                .user(user)
+                .user(actingUser)
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
                 .status(dto.getStatus())
                 .odometerStart(dto.getOdometerStart())
                 .odometerEnd(dto.getOdometerEnd())
                 .totalPrice(dto.getTotalPrice())
-                .createdAt(dto.getStartDate() != null ? dto.getStartDate() : LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .build();
 
         return rentalRepository.save(rental).toRentalDto();
     }
+
 
     public Rental updateRental(Long rentalId, RentalUpdateDto dto) {
         Rental rental = rentalRepository.findById(rentalId)
