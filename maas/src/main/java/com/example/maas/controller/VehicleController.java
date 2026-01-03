@@ -196,4 +196,9 @@ public class VehicleController {
                         : ResponseEntity.notFound().build())
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/inspection/overdue")
+    public List<VehicleDto> getVehiclesWithOverdueInspection() {
+        return vehicleService.getVehiclesWithOverdueInspection();
+    }
 }

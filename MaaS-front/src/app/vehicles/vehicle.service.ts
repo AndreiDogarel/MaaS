@@ -81,4 +81,10 @@ export class VehicleService {
   deleteRentalRecord(vehicleId: string, rentalId: string | number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${vehicleId}/rentals/${rentalId}`);
   }
+
+  deleteDecommissionedVehicles(): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = { 'Authorization': `Bearer ${token}` };
+    return this.http.delete('http://localhost:8080/api/admin/deleteDecommissionedVehicles', { headers, responseType: 'text' });
+  }
 }

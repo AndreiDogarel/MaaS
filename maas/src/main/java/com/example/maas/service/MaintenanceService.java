@@ -31,10 +31,24 @@ public class MaintenanceService {
                 .type(maintenanceDto.getType())
                 .description(maintenanceDto.getDescription())
                 .cost(maintenanceDto.getCost())
+                .inspection(maintenanceDto.getInspection())
+                .nextInspectionDate(maintenanceDto.getNextInspectionDate())
+                .mileage(maintenanceDto.getMileage())
                 .vehicle(vehicle) // Set the fully loaded Vehicle entity
                 .build();
 
-        return maintenanceRepository.save(entity);
+        Maintenance saved = maintenanceRepository.save(entity);
+
+        // If a mileage was provided with the maintenance, update the vehicle's mileage
+        if (maintenanceDto.getMileage() != null) {
+            Long provided = maintenanceDto.getMileage();
+            if (vehicle.getMileage() == null || provided >= vehicle.getMileage()) {
+                vehicle.setMileage(provided);
+                vehicleRepository.save(vehicle);
+            }
+        }
+
+        return saved;
     }
 
     public Optional<Maintenance> getMaintenanceById(Long maintenanceId) {
@@ -50,9 +64,26 @@ public class MaintenanceService {
             existing.setType(updateDto.getType());
             existing.setDescription(updateDto.getDescription());
             existing.setCost(updateDto.getCost());
+            existing.setInspection(updateDto.getInspection());
+            existing.setNextInspectionDate(updateDto.getNextInspectionDate());
+            existing.setMileage(updateDto.getMileage());
         }
 
-        return maintenanceRepository.save(existing);
+        Maintenance saved = maintenanceRepository.save(existing);
+
+        // If the update includes a mileage, update the vehicle's mileage as well
+        if (updateDto != null && updateDto.getMileage() != null) {
+            Vehicle vehicle = saved.getVehicle();
+            if (vehicle != null) {
+                Long provided = updateDto.getMileage();
+                if (vehicle.getMileage() == null || provided >= vehicle.getMileage()) {
+                    vehicle.setMileage(provided);
+                    vehicleRepository.save(vehicle);
+                }
+            }
+        }
+
+        return saved;
     }
 
     public boolean deleteMaintenance(Long maintenanceId) {

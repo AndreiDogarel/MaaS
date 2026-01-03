@@ -11,4 +11,7 @@ public class MaintenanceUpdateDto {
     private String type;
     private String description;
     private Double cost;
+    private Boolean inspection;
+    private LocalDate nextInspectionDate;
+    private Long mileage;
 }

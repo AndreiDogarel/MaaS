@@ -4,6 +4,7 @@ import { VehicleFormComponent } from './vehicles/vehicle-form.component';
 import { VehicleListComponent } from './vehicles/vehicle-list.component';
 import { VehicleDetailComponent } from './vehicles/vehicle-detail.component';
 import { UploadDocumentComponent } from './documents/upload-document.component';
+import { ManageCustomersComponent } from './customers/manage-customers.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component';
 import { LoginComponent } from './auth/login/login.component';
@@ -32,6 +33,7 @@ export const routes: Routes = [
             { path: 'vehicles/:id', component: VehicleDetailComponent },
             { path: 'users', component: UsersListComponent, canActivate: [authGuard] },
             { path: 'documents/upload', component: UploadDocumentComponent, canActivate: [authGuard] },
+            { path: 'customers', component: ManageCustomersComponent, canActivate: [authGuard] },
             { path: 'reports/monthly', component: MonthlyReportsComponent, canActivate: [authGuard] }
         ]
     },

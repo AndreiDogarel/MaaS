@@ -32,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/showUsers").permitAll()
                         .requestMatchers("/api/vehicles/**").permitAll()
                         .requestMatchers("/api/documents/**").permitAll()
+                        .requestMatchers("/api/llm/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

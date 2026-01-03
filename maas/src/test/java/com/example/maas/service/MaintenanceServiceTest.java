@@ -3,6 +3,7 @@ package com.example.maas.service;
 import com.example.maas.entities.Maintenance;
 import com.example.maas.entities.Vehicle;
 import com.example.maas.repository.MaintenanceRepository;
+import com.example.maas.repository.VehicleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,9 @@ public class MaintenanceServiceTest {
 
     @Mock
     private MaintenanceRepository maintenanceRepository;
+
+    @Mock
+    private VehicleRepository vehicleRepository;
 
     @InjectMocks
     private MaintenanceService maintenanceService;

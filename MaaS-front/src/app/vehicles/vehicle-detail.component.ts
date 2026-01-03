@@ -40,7 +40,10 @@ export class VehicleDetailComponent implements OnInit {
     date: '',
     type: '',
     description: '',
-    cost: null as number | null
+    cost: null as number | null,
+    isInspection: false,
+    nextInspection: '',
+    mileage: null as number | null
   };
 
   towingForm = {
@@ -133,7 +136,10 @@ export class VehicleDetailComponent implements OnInit {
       date: record.date ? record.date.split('T')[0] : '',
       type: record.type || '',
       description: record.description || '',
-      cost: record.cost ?? null
+      cost: record.cost ?? null,
+      isInspection: record.isInspection ?? false,
+      nextInspection: record.nextInspection ? record.nextInspection.split('T')[0] : '',
+      mileage: record.mileage ?? null
     };
   }
 
@@ -149,6 +155,9 @@ export class VehicleDetailComponent implements OnInit {
       type: this.maintenanceForm.type,
       description: this.maintenanceForm.description,
       cost: this.maintenanceForm.cost,
+      isInspection: this.maintenanceForm.isInspection,
+      nextInspection: this.maintenanceForm.nextInspection || null,
+      mileage: this.maintenanceForm.mileage,
       vehicleId: this.vehicle.id
     };
 
@@ -386,7 +395,10 @@ export class VehicleDetailComponent implements OnInit {
       date: '',
       type: '',
       description: '',
-      cost: null
+      cost: null,
+      isInspection: false,
+      nextInspection: '',
+      mileage: null
     };
   }
 
