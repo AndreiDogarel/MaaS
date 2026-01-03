@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,10 +29,10 @@ public class Rental {
     private User user;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Column(nullable = false, length = 32)
     private String status;
@@ -52,8 +53,6 @@ public class Rental {
         System.out.println(this.getUser().getId());
         return RentalDto.builder()
                 .id(this.getId())
-                .vehicleId(this.getVehicle().getId())
-                .userId(this.getUser().getId())
                 .startDate(this.getStartDate())
                 .endDate(this.getEndDate())
                 .status(this.getStatus())

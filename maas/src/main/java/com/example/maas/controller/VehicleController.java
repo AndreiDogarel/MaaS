@@ -149,36 +149,41 @@ public class VehicleController {
 
     @GetMapping("/{id}/rentals")
     public List<RentalDto> getRentalHistory(@PathVariable Long id) {
-        return rentalService.getRentalHistory(id);
+        return rentalService.getRentalHistory(id).stream().map(e -> e.toRentalDto()).toList();
     }
 
     @PostMapping("/{id}/rentals")
-    public ResponseEntity<RentalDto> addRental(@PathVariable Long id, @RequestBody RentalDto rental) {
-        if (rental == null || rental.getVehicleId() == null || !id.equals(rental.getVehicleId())) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<?> addRental(@PathVariable Long id, @RequestBody RentalDto rental) {
         try {
-            RentalDto created = rentalService.createRental(rental);
+            RentalDto created = rentalService.createRental(id, rental);
             return ResponseEntity.ok(created);
+        } catch (org.springframework.security.access.AccessDeniedException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.notFound().build();
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Failed to create rental");
         }
     }
 
     @GetMapping("/{id}/rentals/{rentalId}")
-    public ResponseEntity<Rental> getRentalById(@PathVariable Long id, @PathVariable Long rentalId) {
+    public ResponseEntity<RentalDto> getRentalById(@PathVariable Long id, @PathVariable Long rentalId) {
         return rentalService.getRentalById(rentalId)
                 .filter(r -> r.getVehicle() != null && r.getVehicle().getId().equals(id))
-                .map(ResponseEntity::ok)
+                .map(r -> ResponseEntity.ok(r.toRentalDto()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/rentals/{rentalId}")
-    public ResponseEntity<Rental> updateRental(@PathVariable Long id, @PathVariable Long rentalId, @RequestBody RentalUpdateDto dto) {
+    public ResponseEntity<RentalDto> updateRental(@PathVariable Long id, @PathVariable Long rentalId, @RequestBody RentalUpdateDto dto) {
+        System.out.println("Rental ID: " + rentalId);
         return rentalService.getRentalById(rentalId)
                 .filter(r -> r.getVehicle() != null && r.getVehicle().getId().equals(id))
-                .map(existing -> ResponseEntity.ok(rentalService.updateRental(rentalId, dto)))
+                .map(existing -> {
+                    Rental updated = rentalService.updateRental(rentalId, dto);
+                    return ResponseEntity.ok(updated.toRentalDto());
+                })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -186,7 +191,9 @@ public class VehicleController {
     public ResponseEntity<?> deleteRental(@PathVariable Long id, @PathVariable Long rentalId) {
         return rentalService.getRentalById(rentalId)
                 .filter(r -> r.getVehicle() != null && r.getVehicle().getId().equals(id))
-                .map(existing -> rentalService.deleteRental(rentalId) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build())
+                .map(existing -> rentalService.deleteRental(rentalId)
+                        ? ResponseEntity.noContent().build()
+                        : ResponseEntity.notFound().build())
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
