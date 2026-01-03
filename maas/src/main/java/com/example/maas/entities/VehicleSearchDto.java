@@ -16,4 +16,7 @@ public class VehicleSearchDto {
     private String licenseCategory;
     private String status;
     private Long pricePerDay;
+
+    public VehicleSearchDto(String reg123, Object o, Object o1, Object o2, Object o3, Object o4, Object o5) {
+    }
 }

@@ -14,6 +14,9 @@ export class AuthService {
     private isAdminSubject = new BehaviorSubject<boolean>(false);
     isAdmin$ = this.isAdminSubject.asObservable();
 
+    private isCustomerSubject = new BehaviorSubject<boolean>(false);
+    isCustomer$ = this.isCustomerSubject.asObservable();
+
     private http = inject(HttpClient);
     private router = inject(Router);
     private apiUrl = 'http://localhost:8080/api/auth';
@@ -42,6 +45,10 @@ export class AuthService {
         return this.http.post(this.apiUrl + '/login', credentials, { responseType: 'text' });
     }
 
+    registerApio(credentials: any): Observable<string> {
+        return this.http.post(this.apiUrl + '/register', credentials, { responseType: 'text' });
+    }    
+
     logout(): void {
         localStorage.removeItem('token');
         this.isLoggedInSubject.next(false);
@@ -59,7 +66,10 @@ export class AuthService {
             tap(response => {
                 if (response && response.role === 'ADMIN') {
                     this.isAdminSubject.next(true);
-                } else {
+                } else if (response && response.role === 'CUSTOMER') {
+                    this.isCustomerSubject.next(true);
+                }
+                else {
                     this.isAdminSubject.next(false);
                 }
             }),

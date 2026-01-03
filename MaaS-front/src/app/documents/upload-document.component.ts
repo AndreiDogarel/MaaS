@@ -7,6 +7,7 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-upload-document',
   templateUrl: './upload-document.component.html',
+  styleUrls: ['./upload-document.component.css'],
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
@@ -18,20 +19,28 @@ export class UploadDocumentComponent {
   uploading = false;
 
   constructor(private docService: DocumentService) {}
+  identityFileName = '';
+  drivingFileName = '';
+  extraFileName = '';
 
   onIdentitySelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.identityFile = input.files[0];
+      if (this.identityFile) this.identityFileName = this.identityFile.name;
     } else {
       this.identityFile = undefined;
     }
   }
 
+
+
+
   onDrivingSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.drivingFile = input.files[0];
+      if (this.drivingFile) this.drivingFileName = this.drivingFile.name;
     } else {
       this.drivingFile = undefined;
     }
@@ -41,12 +50,14 @@ export class UploadDocumentComponent {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.extraFile = input.files[0];
+      if (this.extraFile) this.extraFileName = this.extraFile.name;
     } else {
       this.extraFile = undefined;
     }
   }
 
   upload() {
+    console.log("Upload initiated");
     const requests = [];
     this.message = '';
 
@@ -57,6 +68,7 @@ export class UploadDocumentComponent {
       requests.push(this.docService.uploadDocument(this.drivingFile, 'DRIVING_LICENCE'));
     }
 
+    console.log(requests.length + " files to upload");
     if (requests.length === 0) {
       this.message = 'Please select at least one file (Identity card or Driving licence) to upload.';
       return;
