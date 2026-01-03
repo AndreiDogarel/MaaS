@@ -175,6 +175,11 @@ public class VehicleController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/rentals/getPending")
+    public ResponseEntity<List<RentalContractDto>> getPendingRentals() {
+        return ResponseEntity.ok(rentalService.getAllPendingRentals());
+    }
+
     @PutMapping("/{id}/rentals/{rentalId}")
     public ResponseEntity<RentalDto> updateRental(@PathVariable Long id, @PathVariable Long rentalId, @RequestBody RentalUpdateDto dto) {
         System.out.println("Rental ID: " + rentalId);

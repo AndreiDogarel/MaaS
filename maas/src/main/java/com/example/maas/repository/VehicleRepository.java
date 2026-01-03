@@ -31,4 +31,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
               )
     """)
     void deleteDecommissionedVehicles();
+
+    List<Vehicle> findVehicleById(Long id);
 }

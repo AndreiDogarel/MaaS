@@ -61,4 +61,12 @@ public class Rental {
                 .totalPrice(this.getTotalPrice())
                 .build();
     }
+    public RentalContractDto toRentalContractDto(String registrationPlate, String username){
+        return RentalContractDto.builder()
+                .registrationPlate(registrationPlate)
+                .username(username)
+                .startDate(this.startDate)
+                .endDate(this.endDate)
+                .build();
+    }
 }

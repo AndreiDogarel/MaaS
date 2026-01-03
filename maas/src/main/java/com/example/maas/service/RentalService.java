@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -122,4 +123,17 @@ public class RentalService {
         return true;
     }
 
+    public List<RentalContractDto> getAllPendingRentals() {
+        List<Rental> allPendingRentals = rentalRepository.findAll().stream().filter(r -> r.getStatus().equals("PENDING")).toList();
+        List<RentalContractDto> allPendingRentalsDtos = new ArrayList<>();
+        for (Rental rental : allPendingRentals) {
+            allPendingRentalsDtos.add(
+                    rental.toRentalContractDto(
+                            rental.getVehicle().getRegistrationNumber(),
+                            rental.getUser().getUsername()
+                    )
+            );
+        }
+        return allPendingRentalsDtos;
+    }
 }
