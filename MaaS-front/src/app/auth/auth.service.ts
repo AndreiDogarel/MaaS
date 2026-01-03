@@ -17,6 +17,10 @@ export class AuthService {
     private isCustomerSubject = new BehaviorSubject<boolean>(false);
     isCustomer$ = this.isCustomerSubject.asObservable();
 
+
+    private isEmployeeSubject = new BehaviorSubject<boolean>(false);
+    isEmployee$ = this.isAdminSubject.asObservable();
+
     private http = inject(HttpClient);
     private router = inject(Router);
     private apiUrl = 'http://localhost:8080/api/auth';
@@ -67,6 +71,8 @@ export class AuthService {
                 if (response && response.role === 'ADMIN') {
                     this.isAdminSubject.next(true);
                 } else if (response && response.role === 'CUSTOMER') {
+                    this.isCustomerSubject.next(true);
+                }else if (response && response.role === 'EMPLOYEE') {
                     this.isCustomerSubject.next(true);
                 }
                 else {

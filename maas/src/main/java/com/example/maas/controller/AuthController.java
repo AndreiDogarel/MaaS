@@ -1,15 +1,14 @@
 package com.example.maas.controller;
 
-import com.example.maas.entities.Role;
-import com.example.maas.entities.User;
-import com.example.maas.entities.UserLoginDto;
-import com.example.maas.entities.UserRegisterDto;
+import com.example.maas.entities.*;
 import com.example.maas.repository.RoleRepository;
 import com.example.maas.repository.UserRepository;
 import com.example.maas.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,12 +66,14 @@ public class AuthController {
     }
 
     @GetMapping("/validate")
-    public ResponseEntity<com.example.maas.entities.UserDto> validate() {
-        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
+    public ResponseEntity<UserDto> validate() {
+        System.out.println(">>> Validate user");
+        Authentication authentication = SecurityContextHolder
                 .getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof User) {
             User user = (User) authentication.getPrincipal();
-            return ResponseEntity.ok(new com.example.maas.entities.UserDto(user));
+            System.out.println(">>> User: " + user.getUsername());
+            return ResponseEntity.ok(new UserDto(user));
         }
         return ResponseEntity.status(401).build();
     }
