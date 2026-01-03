@@ -41,7 +41,7 @@ public class RentalService {
         return rentalRepository.findById(rentalId);
     }
 
-    public RentalDto createRental(Long vehicleId, RentalDto dto) {
+    public Rental createRental(Long vehicleId, RentalDto dto) {
         if (dto == null) {
             throw new IllegalArgumentException("Rental payload is required");
         }
@@ -84,7 +84,7 @@ public class RentalService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return rentalRepository.save(rental).toRentalDto();
+        return rentalRepository.save(rental);
     }
 
 
