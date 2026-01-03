@@ -38,7 +38,7 @@ import { AuthService } from '../../auth/auth.service';
                 <a *ngIf="authService.isCustomer$ | async" routerLink="/documents/upload" routerLinkActive="border-blue-500 text-gray-900 dark:text-white" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 dark:text-gray-300 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-100 transition-colors">
                   Upload Documents
                 </a>
-                <a *ngIf="authService.isEmployee$ | async" routerLink="/createRentalContract" routerLinkActive="border-blue-500 text-gray-900 dark:text-white" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 dark:text-gray-300 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-100 transition-colors">
+                <a *ngIf="authService.isEmployee$ | async" routerLink="/rentals/pending" routerLinkActive="border-blue-500 text-gray-900 dark:text-white" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 dark:text-gray-300 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-100 transition-colors">
                   Create Rental Contract
                 </a>
               </div>

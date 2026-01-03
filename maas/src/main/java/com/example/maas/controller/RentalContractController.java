@@ -23,8 +23,7 @@ public class RentalContractController {
     ) {
         return ResponseEntity.ok(
                 rentalContractService.createContract(
-                        request.getClientId(),
-                        request.getVehicleId(),
+                        request.getRegistrationNumber(),
                         request.getStartDate(),
                         request.getEndDate()
                 )

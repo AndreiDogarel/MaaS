@@ -12,11 +12,9 @@ import java.time.LocalDate;
 @Builder
 public class RentalContractCreateRequest {
 
-    private Long clientId;
-    private Long vehicleId;
+    private String registrationNumber;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Long operatorId;
 
     // getters & setters
 }

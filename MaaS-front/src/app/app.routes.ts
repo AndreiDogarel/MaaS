@@ -12,6 +12,7 @@ import { RegisterComponent } from './auth/register/register.component';
 import { HomeComponent } from './home/home.component';
 import { authGuard } from './auth/auth.guard';
 import {MonthlyReportsComponent} from "./reports/monthly-reports.component";
+import { RentalContractComponent } from './rental-contract/rental-contract.component';
 
 export const routes: Routes = [
     {
@@ -34,7 +35,8 @@ export const routes: Routes = [
             { path: 'users', component: UsersListComponent, canActivate: [authGuard] },
             { path: 'documents/upload', component: UploadDocumentComponent, canActivate: [authGuard] },
             { path: 'customers', component: ManageCustomersComponent, canActivate: [authGuard] },
-            { path: 'reports/monthly', component: MonthlyReportsComponent, canActivate: [authGuard] }
+            { path: 'reports/monthly', component: MonthlyReportsComponent, canActivate: [authGuard] },
+            { path: 'rentals/pending', component: RentalContractComponent, canActivate: [authGuard] }
         ]
     },
     { path: '**', redirectTo: '' }
