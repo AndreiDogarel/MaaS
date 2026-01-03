@@ -98,7 +98,7 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .build();
 
         assertThrows(IllegalArgumentException.class, () -> rentalService.createRental(1L, dto));
@@ -116,7 +116,7 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .build();
 
         assertThrows(AccessDeniedException.class, () -> rentalService.createRental(1L, dto));
@@ -138,7 +138,7 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .build();
 
         assertThrows(AccessDeniedException.class, () -> rentalService.createRental(1L, dto));
@@ -170,7 +170,7 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .build();
 
         assertThrows(AccessDeniedException.class, () -> rentalService.createRental(1L, dto));
@@ -206,7 +206,7 @@ class RentalServiceTest {
                 .user(principalUser)
                 .startDate(LocalDate.of(2026, 1, 3))
                 .endDate(LocalDate.of(2026, 1, 5))
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .odometerStart(100L)
                 .odometerEnd(200L)
                 .totalPrice(new BigDecimal("150.50"))
@@ -218,7 +218,7 @@ class RentalServiceTest {
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
                 .endDate(LocalDate.of(2026, 1, 5))
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .odometerStart(100L)
                 .odometerEnd(200L)
                 .totalPrice(new BigDecimal("150.50"))
@@ -230,7 +230,7 @@ class RentalServiceTest {
         assertEquals(123L, out.getId());
         assertEquals(1L, out.getVehicle().getId());
         assertEquals(99L, out.getUser().getId());
-        assertEquals("CREATED", out.getStatus());
+        assertEquals(RentalStatus.COMPLETED, out.getStatus());
         verify(hasValidDocuments).check(99L);
         verify(rentalRepository).save(rentalCaptor.capture());
 
@@ -266,7 +266,7 @@ class RentalServiceTest {
                 .vehicle(vehicle)
                 .user(principalUser)
                 .startDate(LocalDate.of(2026, 1, 3))
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .createdAt(LocalDateTime.of(2026, 1, 3, 0, 0))
                 .build();
 
@@ -274,7 +274,7 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .build();
 
         RentalDto out = rentalService.createRental(1L, dto).toRentalDto();
@@ -313,7 +313,7 @@ class RentalServiceTest {
                 .vehicle(vehicle)
                 .user(dbUser)
                 .startDate(LocalDate.of(2026, 1, 3))
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .createdAt(LocalDateTime.of(2026, 1, 3, 0, 0))
                 .build();
 
@@ -321,7 +321,7 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .build();
 
         Rental out = rentalService.createRental(1L, dto);
@@ -337,7 +337,7 @@ class RentalServiceTest {
     void updateRental_notFound_throwsIllegalArgumentException() {
         when(rentalRepository.findById(1L)).thenReturn(Optional.empty());
 
-        RentalUpdateDto dto = RentalUpdateDto.builder().status("UPDATED").build();
+        RentalUpdateDto dto = RentalUpdateDto.builder().status(RentalStatus.COMPLETED).build();
 
         assertThrows(IllegalArgumentException.class, () -> rentalService.updateRental(1L, dto));
         verify(rentalRepository).findById(1L);
@@ -350,7 +350,7 @@ class RentalServiceTest {
                 .id(1L)
                 .startDate(LocalDate.of(2026, 1, 1))
                 .endDate(null)
-                .status("CREATED")
+                .status(RentalStatus.COMPLETED)
                 .odometerStart(10L)
                 .odometerEnd(null)
                 .totalPrice(new BigDecimal("10.00"))
@@ -361,14 +361,14 @@ class RentalServiceTest {
 
         RentalUpdateDto dto = RentalUpdateDto.builder()
                 .endDate(LocalDate.of(2026, 1, 2))
-                .status("UPDATED")
+                .status(RentalStatus.COMPLETED)
                 .odometerEnd(20L)
                 .build();
 
         Rental out = rentalService.updateRental(1L, dto);
 
         assertEquals(1L, out.getId());
-        assertEquals("UPDATED", out.getStatus());
+        assertEquals(RentalStatus.COMPLETED, out.getStatus());
         assertEquals(LocalDate.of(2026, 1, 2), out.getEndDate());
         assertEquals(10L, out.getOdometerStart());
         assertEquals(20L, out.getOdometerEnd());
