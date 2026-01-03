@@ -15,7 +15,7 @@ public class RentalUpdateDto {
 
     private LocalDate startDate;
     private LocalDate endDate;
-    private String status;
+    private RentalStatus status;
     private Long odometerStart;
     private Long odometerEnd;
     private BigDecimal totalPrice;
