@@ -155,7 +155,7 @@ public class VehicleController {
     @PostMapping("/{id}/rentals")
     public ResponseEntity<?> addRental(@PathVariable Long id, @RequestBody RentalDto rental) {
         try {
-            RentalDto created = rentalService.createRental(id, rental);
+            RentalDto created = rentalService.createRental(id, rental).toRentalDto();
             return ResponseEntity.ok(created);
         } catch (org.springframework.security.access.AccessDeniedException e) {
             return ResponseEntity.status(403).body(e.getMessage());

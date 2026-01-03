@@ -1,10 +1,7 @@
 package com.example.maas.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "ROLES")
@@ -12,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Roles {
 
     @Id
@@ -21,4 +19,5 @@ public class Roles {
     @Enumerated(EnumType.STRING)
     @Column(unique = true, nullable = false)
     private Role name;
+
 }
