@@ -4,6 +4,7 @@ import { VehicleService } from './vehicle.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth/auth.service';
+import { RentalStatus } from '../rentals/rental-status';
 
 @Component({
   selector: 'app-vehicle-detail',
@@ -35,6 +36,8 @@ export class VehicleDetailComponent implements OnInit {
 
   isEditingRental = false;
   editingRentalId: number | null = null;
+
+  rentalStatusValues = Object.values(RentalStatus);
 
   maintenanceForm = {
     date: '',

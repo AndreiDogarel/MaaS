@@ -35,7 +35,7 @@ public class Rental {
     private LocalDate endDate;
 
     @Column(nullable = false, length = 32)
-    private String status;
+    private RentalStatus status;
 
     @Column(name = "odometer_start")
     private Long odometerStart;
