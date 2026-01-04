@@ -51,7 +51,7 @@ public class RentalContractService {
         contract.setOperator(userRepository.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
 
         contractRepository.save(contract);
-        rental.setStatus("ACTIVE");
+        rental.setStatus(RentalStatus.ACTIVE);
         rentalRepository.save(rental);
         System.out.println(contract.getOperator().getUsername());
         System.out.println(contract.getOperator().getId());
