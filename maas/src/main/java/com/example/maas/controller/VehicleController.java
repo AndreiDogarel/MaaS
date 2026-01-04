@@ -32,6 +32,35 @@ public class VehicleController {
         this.rentalService = rentalService;
     }
 
+    @PostMapping
+    public ResponseEntity<?> addVehicle(@RequestBody CreateVehicleRequest req) {
+        if (req == null) {
+            return ResponseEntity.badRequest().body("Vehicle payload is required");
+        }
+        try {
+            Vehicle created = vehicleService.create(req);
+
+            VehicleDto dto = new VehicleDto();
+            dto.setId(created.getId());
+            dto.setRegistrationNumber(created.getRegistrationNumber());
+            dto.setBrand(created.getBrand());
+            dto.setModel(created.getModel());
+            dto.setYear(created.getYear());
+            dto.setMileage(created.getMileage());
+            dto.setLicenseCategory(created.getLicenseCategory());
+            dto.setStatus(created.getStatus());
+            dto.setPricePerDay(created.getPricePerDay());
+
+            return ResponseEntity.ok(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Failed to create vehicle");
+        }
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<VehicleDto> getVehicleById(@PathVariable Long id) {
         return vehicleService.getVehicleById(id)
