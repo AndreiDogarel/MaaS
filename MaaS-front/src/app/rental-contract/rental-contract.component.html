@@ -1,0 +1,81 @@
+<div style="max-width: 900px; margin: 2rem auto;">
+
+    <h2>Pending Rental Contracts</h2>
+  
+    <!-- Loading -->
+    <p *ngIf="loading">Loading...</p>
+  
+    <!-- Error -->
+    <p *ngIf="error" style="color:red">{{ error }}</p>
+  
+    <!-- Empty -->
+    <p *ngIf="!loading && rentals.length === 0">
+      No pending rentals found.
+    </p>
+  
+    <!-- Table -->
+    <!-- <div class="pending-container">
+
+      <h2>Pending Rental Contracts</h2>
+    
+      <table class="pending-table" *ngIf="rentals.length > 0">
+        <thead>
+          <tr>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Registration Plate</th>
+            <th>Username</th>
+          </tr>
+        </thead>
+    
+        <tbody>
+          <tr *ngFor="let r of rentals">
+            <td>{{ r.startDate }}</td>
+            <td>{{ r.endDate }}</td>
+            <td>{{ r.registrationPlate }}</td>
+            <td>{{ r.username }}</td>
+          </tr>
+        </tbody>
+      </table>
+    
+    </div> -->
+    <div class="pending-container">
+
+      <h2>Pending Rental Contracts</h2>
+    
+      <p *ngIf="loading">Loading...</p>
+      <p *ngIf="error" style="color:red">{{ error }}</p>
+    
+      <p *ngIf="!loading && rentals.length === 0">
+        No pending rentals found.
+      </p>
+    
+      <table class="pending-table" *ngIf="rentals.length > 0">
+        <thead>
+          <tr>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Registration Plate</th>
+            <th>Username</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+    
+        <tbody>
+          <tr *ngFor="let r of rentals">
+            <td>{{ r.startDate }}</td>
+            <td>{{ r.endDate }}</td>
+            <td>{{ r.registrationPlate }}</td>
+            <td>{{ r.username }}</td>
+            <td>
+              <button (click)="createContract(r)">
+                Create Contract
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    
+    </div>
+  
+  </div>
