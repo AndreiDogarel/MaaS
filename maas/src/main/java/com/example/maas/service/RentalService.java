@@ -73,18 +73,40 @@ public class RentalService {
             throw new AccessDeniedException("User does not have valid documents");
         }
 
-        Rental rental = Rental.builder()
+        long days = java.time.temporal.ChronoUnit.DAYS.between(dto.getStartDate(), dto.getEndDate());
+        if (days <= 0) {
+            throw new IllegalArgumentException("Rental must be at least 1 day");
+        }
+
+        long mileage = vehicle.getMileage();
+
+        java.math.BigDecimal totalPrice = java.math.BigDecimal.valueOf(vehicle.getPricePerDay())
+                .multiply(java.math.BigDecimal.valueOf(days));
+
+        Rental.RentalBuilder builder = Rental.builder()
                 .vehicle(vehicle)
                 .user(actingUser)
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
-                .status(dto.getStatus())
-                .odometerStart(dto.getOdometerStart())
-                .odometerEnd(dto.getOdometerEnd())
-                .totalPrice(dto.getTotalPrice())
-                .createdAt(LocalDateTime.now())
-                .build();
+                .createdAt(LocalDateTime.now());
 
+        if (isCustomer) {
+            builder
+                    .status(RentalStatus.PENDING)
+                    .odometerStart(mileage)
+                    .odometerEnd(mileage)
+                    .totalPrice(totalPrice);
+        } else if (isAdmin) {
+            builder
+                    .status(dto.getStatus())
+                    .odometerStart(dto.getOdometerStart())
+                    .odometerEnd(dto.getOdometerEnd())
+                    .totalPrice(dto.getTotalPrice());
+        } else {
+            throw new AccessDeniedException("Unsupported role");
+        }
+
+        Rental rental = builder.build();
         return rentalRepository.save(rental);
     }
 

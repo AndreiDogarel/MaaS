@@ -320,24 +320,30 @@ export class VehicleDetailComponent implements OnInit {
   }
 
   submitRentalForm(): void {
-    if (!this.rentalForm.startDate || !this.rentalForm.status) {
-      alert('Please fill in required fields (start date and status)');
+    if (!this.rentalForm.startDate || !this.rentalForm.endDate) {
+      alert('Please fill in required fields (start date and end date)');
       return;
     }
 
     this.rentalFormSubmitting = true;
-    const payload = {
+
+    const payload: any = {
       startDate: this.rentalForm.startDate,
-      endDate: this.rentalForm.endDate || null,
-      status: this.rentalForm.status,
-      odometerStart: this.rentalForm.odometerStart,
-      odometerEnd: this.rentalForm.odometerEnd,
-      totalPrice: this.rentalForm.totalPrice,
+      endDate: this.rentalForm.endDate,
       vehicleId: this.vehicle.id
     };
 
     if (this.isEditingRental && this.editingRentalId != null) {
-      this.vehicleService.updateRentalRecord(String(this.vehicle.id), String(this.editingRentalId), payload).subscribe({
+      const updatePayload: any = {
+        startDate: this.rentalForm.startDate,
+        endDate: this.rentalForm.endDate || null,
+        status: this.rentalForm.status || null,
+        odometerStart: this.rentalForm.odometerStart,
+        odometerEnd: this.rentalForm.odometerEnd,
+        totalPrice: this.rentalForm.totalPrice
+      };
+
+      this.vehicleService.updateRentalRecord(String(this.vehicle.id), String(this.editingRentalId), updatePayload).subscribe({
         next: (data) => {
           const idx = this.rentalHistory.findIndex((r: any) => (r.id ?? r.rentalId) === this.editingRentalId);
           if (idx !== -1) this.rentalHistory[idx] = data;
