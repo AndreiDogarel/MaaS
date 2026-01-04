@@ -20,17 +20,15 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     List<Vehicle> findByBrand(String brand);
     List<Vehicle> findByModel(String model);
 
-    @Modifying
     @Transactional
-    @Query("""
-        DELETE FROM Vehicle v
-        WHERE v.status = 'UNAVAILABLE'
-          AND (
-                v.mileage > 100000
-                OR (YEAR(CURRENT_DATE) - v.year) > 10
-              )
-    """)
+    @Modifying
+    @Query(value = """
+        DELETE FROM vehicles
+        WHERE status = 'UNAVAILABLE'
+          AND (mileage > 100000 OR (EXTRACT(YEAR FROM CURRENT_DATE) - year) > 10)
+    """, nativeQuery = true)
     void deleteDecommissionedVehicles();
+
 
     List<Vehicle> findVehicleById(Long id);
 }

@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS maintenances (
     type VARCHAR(128) NOT NULL,
     description VARCHAR(256) NOT NULL,
     cost NUMERIC(10, 2) NOT NULL,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS towings (
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS towings (
     location VARCHAR(128) NOT NULL,
     reason VARCHAR(256) NOT NULL,
     duration INT NOT NULL,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
 );
 
 -- Seed Maintenances
