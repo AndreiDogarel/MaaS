@@ -25,30 +25,30 @@
 
   <div *ngIf="report">
     <h4>Summary</h4>
-    <table style="width:100%;border-collapse:collapse; background: #f9f9f9;">
+    <table style="width:100%;border-collapse:collapse;">
       <tbody>
-      <tr><th style="text-align:left;padding:8px;border:1px solid #ddd">Period</th><td style="padding:8px;border:1px solid #ddd">{{ report.year }} / {{ report.month }}</td></tr>
-      <tr><th style="text-align:left;padding:8px;border:1px solid #ddd">Available Vehicles</th><td style="padding:8px;border:1px solid #ddd">{{ report.availableVehicles }}</td></tr>
-      <tr><th style="text-align:left;padding:8px;border:1px solid #ddd">Total Service Cost</th><td style="padding:8px;border:1px solid #ddd; font-weight: bold;">{{ toNumber(report.totalServiceCost) | number:'1.2-2' }}</td></tr>
+      <tr><th style="text-align:left;padding:8px;border:1px solid #ddd;background:#333;color:white">Period</th><td style="padding:8px;border:1px solid #ddd;background:#333;color:white">{{ report.year }} / {{ report.month }}</td></tr>
+      <tr><th style="text-align:left;padding:8px;border:1px solid #ddd;background:#333;color:white">Available Vehicles</th><td style="padding:8px;border:1px solid #ddd;background:#333;color:white">{{ report.availableVehicles }}</td></tr>
+      <tr><th style="text-align:left;padding:8px;border:1px solid #ddd;background:#333;color:white">Total Service Cost</th><td style="padding:8px;border:1px solid #ddd;background:#333;color:white; font-weight: bold;">{{ toNumber(report.totalServiceCost) | number:'1.2-2' }}</td></tr>
       </tbody>
     </table>
-
+    
     <div *ngFor="let cfg of listsConfig" style="margin-top:20px;">
       <ng-container *ngIf="report[cfg.key]?.length; else noneTpl">
         <h4 style="margin-bottom: 8px; color: #333;">{{ cfg.title }}</h4>
         <table style="width:100%;border-collapse:collapse">
           <thead>
-          <tr style="background: #eee;">
-            <th style="padding:8px;border:1px solid #ddd;text-align:left">Item</th>
-            <th style="padding:8px;border:1px solid #ddd;text-align:left">Count</th>
-            <th style="padding:8px;border:1px solid #ddd;text-align:left">Value</th>
+          <tr style="background: #333;color:white;">
+            <th style="padding:8px;border:1px solid #ddd;background:#333;color:white;text-align:left">Item</th>
+            <th style="padding:8px;border:1px solid #ddd;background:#333;color:white;text-align:left">Count</th>
+            <th style="padding:8px;border:1px solid #ddd;background:#333;color:white;text-align:left">Value</th>
           </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let item of report[cfg.key]">
-            <td style="padding:8px;border:1px solid #ddd">{{ item.key || 'N/A' }}</td>
-            <td style="padding:8px;border:1px solid #ddd">{{ item.count || 0 }}</td>
-            <td style="padding:8px;border:1px solid #ddd">{{ toNumber(item.value) | number:'1.2-2' }}</td>
+          <tr *ngFor="let item of report[cfg.key];let even=even" style="background:{{even?'#f9f9f9':'#fff'}}">
+            <td style="padding:8px;border:1px solid #ddd;background:#333;color:white">{{ item.key || 'N/A' }}</td>
+            <td style="padding:8px;border:1px solid #ddd;background:#333;color:white">{{ item.count || 0 }}</td>
+            <td style="padding:8px;border:1px solid #ddd;background:#333;color:white">{{ toNumber(item.value) | number:'1.2-2' }}</td>
           </tr>
           </tbody>
         </table>
