@@ -146,7 +146,7 @@ public class RentalService {
     }
 
     public List<RentalContractDto> getAllPendingRentals() {
-        List<Rental> allPendingRentals = rentalRepository.findAll().stream().filter(r -> r.getStatus().equals("PENDING")).toList();
+        List<Rental> allPendingRentals = rentalRepository.findAll().stream().filter(r -> r.getStatus().equals(RentalStatus.PENDING)).toList();
         List<RentalContractDto> allPendingRentalsDtos = new ArrayList<>();
         for (Rental rental : allPendingRentals) {
             allPendingRentalsDtos.add(
