@@ -16,7 +16,7 @@ export class DocumentService {
     const token = localStorage.getItem('auth_token');
     const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
 
-    return this.http.post(`${this.base}/upload`, fd, { headers });
+    return this.http.post(`${this.base}/upload`, fd, { responseType: 'text' });
   }
 }
 

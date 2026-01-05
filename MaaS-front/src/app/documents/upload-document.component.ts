@@ -3,7 +3,7 @@ import { DocumentService } from '../services/document.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
-
+import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-upload-document',
   templateUrl: './upload-document.component.html',
@@ -55,48 +55,52 @@ export class UploadDocumentComponent {
       this.extraFile = undefined;
     }
   }
-
-  upload() {
+  
+  async upload() {
     console.log("Upload initiated");
-    const requests = [];
     this.message = '';
 
-    if (this.identityFile) {
-      requests.push(this.docService.uploadDocument(this.identityFile, 'IDENTITY_CARD'));
-    }
-    if (this.drivingFile) {
-      requests.push(this.docService.uploadDocument(this.drivingFile, 'DRIVING_LICENCE'));
-    }
+    const tasks: { file: File; type: string; label: string }[] = [];
+    if (this.identityFile) tasks.push({ file: this.identityFile, type: 'IDENTITY_CARD', label: 'Identity card' });
+    if (this.drivingFile) tasks.push({ file: this.drivingFile, type: 'DRIVING_LICENCE', label: 'Driving licence' });
 
-    console.log(requests.length + " files to upload");
-    if (requests.length === 0) {
+    console.log(tasks.length + " files to upload");
+    if (tasks.length === 0) {
       this.message = 'Please select at least one file (Identity card or Driving licence) to upload.';
       return;
     }
 
     this.uploading = true;
 
-    forkJoin(requests).subscribe({
-      next: (res) => {
-        // res is an array of responses matching the order of requests
-        const parts: string[] = [];
-        if (this.identityFile) parts.push(`Identity card (${this.identityFile.name}) uploaded`);
-        if (this.drivingFile) parts.push(`Driving licence (${this.drivingFile.name}) uploaded`);
-        this.message = parts.join(' and ') + '.';
-        this.uploading = false;
-      },
-      error: (err) => {
-        console.error('Upload error', err);
-        // try to show more helpful message
-        if (err && err.error) {
-          this.message = 'Upload failed: ' + (err.error.message || JSON.stringify(err.error));
-        } else if (err && err.status) {
-          this.message = `Upload failed: server responded ${err.status} ${err.statusText}`;
-        } else {
-          this.message = 'Upload failed: unknown error';
+    const successes: string[] = [];
+    const failures: string[] = [];
+
+    try {
+      for (const t of tasks) {
+        try {
+          await firstValueFrom(this.docService.uploadDocument(t.file, t.type));
+          successes.push(`${t.label} (${t.file.name}) uploaded`);
+        } catch (err: any) {
+          failures.push(`${t.label} (${t.file.name}) failed`);
+          console.error('Upload error', t.type, err);
         }
-        this.uploading = false;
       }
-    });
+      console.log("Upload process completed");
+      console.log("Successes:", successes);
+      console.log("Failures:", failures);
+      if (failures.length === 0) {
+        alert('All documents were uploaded successfully!');
+      }
+      
+
+      const msgParts: string[] = [];
+      if (successes.length) msgParts.push(successes.join(' and ') + '.');
+      if (failures.length) msgParts.push('Some uploads failed: ' + failures.join(', ') + '.');
+     
+      this.message = msgParts.join(' ');
+    } finally {
+      this.uploading = false;
+      
+    }
   }
 }
