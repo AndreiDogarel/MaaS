@@ -100,26 +100,57 @@
 
         <!-- Overview Tab -->
         <div *ngIf="activeTab === 'overview'" class="animate-fade-in">
-          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Vehicle Details</h3>
-          <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-            <div class="sm:col-span-1">
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Registration Number</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.registrationNumber }}</dd>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Vehicle Details</h3>
+            <div *ngIf="authService.isAdmin$ | async">
+              <button *ngIf="!isEditingVehicle" (click)="beginEditVehicle()" class="inline-flex items-center px-3 py-1 bg-yellow-500 text-white rounded-md">Edit</button>
+              <div *ngIf="isEditingVehicle" class="space-x-2">
+                <button (click)="saveVehicle()" [disabled]="vehicleEditSubmitting" class="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-md">{{ vehicleEditSubmitting ? 'Saving...' : 'Save' }}</button>
+                <button (click)="cancelEditVehicle()" class="inline-flex items-center px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md">Cancel</button>
+              </div>
             </div>
-            <div class="sm:col-span-1">
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Brand & Model</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.brand }} {{ vehicle.model }}</dd>
+          </div>
+          <form *ngIf="isEditingVehicle; else detailsView" class="space-y-4">
+            <div class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Mileage (km)</label>
+                <input type="number" [(ngModel)]="vehicleEditModel.mileage" name="mileage" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-2 py-2">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                <select [(ngModel)]="vehicleEditModel.status" name="status" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-2 py-2">
+                  <option [value]="'AVAILABLE'">AVAILABLE</option>
+                  <option [value]="'UNAVAILABLE'">UNAVAILABLE</option>
+                  <option [value]="'MAINTENANCE'">MAINTENANCE</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">License Category</label>
+                <input [(ngModel)]="vehicleEditModel.licenseCategory" name="licenseCategory" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-2 py-2">
+              </div>
             </div>
-            <div class="sm:col-span-1">
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Manufacture Year</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.year }}</dd>
-            </div>
-            <div class="sm:col-span-1">
-              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Current Mileage</dt>
-              <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.mileage | number }} km</dd>
-            </div>
-          </dl>
-        </div>
+          </form>
+          <ng-template #detailsView>
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+              <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Registration Number</dt>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.registrationNumber }}</dd>
+              </div>
+              <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Brand & Model</dt>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.brand }} {{ vehicle.model }}</dd>
+              </div>
+              <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Manufacture Year</dt>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.year }}</dd>
+              </div>
+              <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Current Mileage</dt>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ vehicle.mileage | number }} km</dd>
+              </div>
+            </dl>
+          </ng-template>
+         </div>
 
         <!-- Rentals Tab -->
         <div *ngIf="activeTab === 'rentals'" class="animate-fade-in">

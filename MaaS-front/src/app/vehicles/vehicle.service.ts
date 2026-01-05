@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Vehicle } from './vehicle.model';
 import { Observable } from 'rxjs';
@@ -82,9 +82,24 @@ export class VehicleService {
     return this.http.delete<void>(`${this.base}/${vehicleId}/rentals/${rentalId}`);
   }
 
+  // Update a vehicle by id (admin)
+  updateVehicle(id: string | number, vehicle: Partial<Vehicle>): Observable<any> {
+    // include Authorization header if token exists (backend likely protects this endpoint)
+    const token = localStorage.getItem('token');
+    let options: { headers?: HttpHeaders } = {};
+    if (token) {
+      options.headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    }
+    // backend exposes admin update at /api/admin/vehicle/{id}
+    return this.http.put<any>(`http://localhost:8080/api/admin/vehicle/${id}`, vehicle, options);
+  }
+
   deleteDecommissionedVehicles(): Observable<any> {
     const token = localStorage.getItem('token');
-    const headers = { 'Authorization': `Bearer ${token}` };
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
     return this.http.delete('http://localhost:8080/api/admin/deleteDecommissionedVehicles', { headers, responseType: 'text' });
   }
 }

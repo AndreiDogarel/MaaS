@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth/auth.service';
 import { RentalStatus } from '../rentals/rental-status';
+import { Vehicle } from './vehicle.model';
 
 @Component({
   selector: 'app-vehicle-detail',
@@ -20,6 +21,11 @@ export class VehicleDetailComponent implements OnInit {
   rentalHistory: any[] = [];
   isLoading = true;
   error: string | null = null;
+
+  // Admin edit state for vehicle overview
+  isEditingVehicle = false;
+  vehicleEditModel: Partial<Vehicle> = {};
+  vehicleEditSubmitting = false;
 
   showMaintenanceForm = false;
   showTowingForm = false;
@@ -65,6 +71,7 @@ export class VehicleDetailComponent implements OnInit {
     totalPrice: null as number | null
   };
 
+  // include 'admin' in allowed tab values
   activeTab: 'overview' | 'maintenance' | 'towing' | 'rentals' = 'overview';
 
   constructor(
@@ -72,6 +79,70 @@ export class VehicleDetailComponent implements OnInit {
     private vehicleService: VehicleService,
     public authService: AuthService
   ) { }
+
+  beginEditVehicle(): void {
+    if (!this.vehicle) return;
+    this.isEditingVehicle = true;
+    // shallow clone so template edits don't immediately change the displayed vehicle until saved
+    this.vehicleEditModel = { ...this.vehicle };
+  }
+
+  cancelEditVehicle(): void {
+    this.isEditingVehicle = false;
+    this.vehicleEditModel = {};
+  }
+
+  saveVehicle(): void {
+    if (!this.vehicle || !this.vehicle.id) return alert('No vehicle loaded');
+    // Basic validation: only require fields that the admin update endpoint supports
+    if (this.vehicleEditModel.mileage == null || !this.vehicleEditModel.status) {
+      return alert('Please provide mileage and status');
+    }
+
+    this.vehicleEditSubmitting = true;
+
+    // Only send the fields the backend's VehicleUpdateDto expects / updates
+    const payload: any = {
+      mileage: this.vehicleEditModel.mileage,
+      status: this.vehicleEditModel.status,
+      licenseCategory: this.vehicleEditModel.licenseCategory ?? null
+    };
+
+    // Include optional fields if they were provided in the edit model
+    if (this.vehicleEditModel.registrationNumber !== undefined) payload.registrationNumber = this.vehicleEditModel.registrationNumber;
+    if (this.vehicleEditModel.brand !== undefined) payload.brand = this.vehicleEditModel.brand;
+    if (this.vehicleEditModel.model !== undefined) payload.model = this.vehicleEditModel.model;
+    if (this.vehicleEditModel.year !== undefined) payload.year = this.vehicleEditModel.year;
+    if (this.vehicleEditModel.pricePerDay !== undefined) payload.pricePerDay = this.vehicleEditModel.pricePerDay;
+
+    // Debug: log payload and token presence
+    try {
+      const token = localStorage.getItem('token');
+      // eslint-disable-next-line no-console
+      console.log('Updating vehicle', { id: this.vehicle?.id, payload, tokenPresent: !!token });
+    } catch (e) {
+      // ignore in non-browser environments
+    }
+
+    this.vehicleService.updateVehicle(String(this.vehicle.id), payload).subscribe({
+      next: (updated: any) => {
+        // backend returns the DTO we sent — merge into local vehicle for immediate UI update
+        this.vehicle = { ...this.vehicle, ...payload };
+        this.vehicleEditSubmitting = false;
+        this.cancelEditVehicle();
+        alert('Vehicle updated successfully');
+      },
+      error: (err: any) => {
+        console.error('Failed to update vehicle', err);
+        this.vehicleEditSubmitting = false;
+        if (err && err.status === 403) {
+          alert('Failed to update vehicle: you are not authorized. Please login as an admin.');
+        } else {
+          alert('Failed to save vehicle changes');
+        }
+      }
+    });
+  }
 
   setActiveTab(tab: 'overview' | 'maintenance' | 'towing' | 'rentals'): void {
     this.activeTab = tab;
