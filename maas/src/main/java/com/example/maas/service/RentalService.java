@@ -55,6 +55,14 @@ public class RentalService {
             throw new org.springframework.security.access.AccessDeniedException("Authentication required");
         }
 
+        if (dto.getStartDate() == null || dto.getEndDate() == null) {
+            throw new IllegalArgumentException("startDate and endDate are required");
+        }
+        if (dto.getEndDate().isBefore(dto.getStartDate()) || dto.getEndDate().isEqual(dto.getStartDate())) {
+            throw new IllegalArgumentException("endDate must be after startDate");
+        }
+
+
         User actingUser;
         if (authentication.getPrincipal() instanceof User) {
             actingUser = (User) authentication.getPrincipal();

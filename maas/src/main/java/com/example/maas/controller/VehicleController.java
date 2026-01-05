@@ -69,36 +69,36 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}/maintenance")
-    public List<Maintenance> getMaintenanceHistory(@PathVariable Long id) {
+    public List<MaintenanceDto> getMaintenanceHistory(@PathVariable Long id) {
         return maintenanceService.getMaintenanceHistory(id);
     }
 
     @GetMapping("/{id}/towing")
-    public List<Towing> getTowingHistory(@PathVariable Long id) {
+    public List<TowingDto> getTowingHistory(@PathVariable Long id) {
         return towingService.getTowingHistory(id);
     }
 
     @PostMapping("/{id}/towing")
-    public ResponseEntity<Towing> addTowing(@PathVariable Long id, @RequestBody TowingDto towing) {
+    public ResponseEntity<TowingDto> addTowing(@PathVariable Long id, @RequestBody TowingDto towing) {
         if (towing == null || towing.getVehicleId() == null || !id.equals(towing.getVehicleId())) {
             return ResponseEntity.badRequest().build();
         }
         try {
             Towing created = towingService.createTowing(towing);
-            return ResponseEntity.ok(created);
+            return ResponseEntity.ok(created.toDto());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/{id}/maintenance")
-    public ResponseEntity<Maintenance> addMaintenance(@PathVariable Long id, @RequestBody MaintenanceDto maintenance) {
+    public ResponseEntity<MaintenanceDto> addMaintenance(@PathVariable Long id, @RequestBody MaintenanceDto maintenance) {
         if (maintenance == null || maintenance.getVehicleId() == null || !id.equals(maintenance.getVehicleId())) {
             return ResponseEntity.badRequest().build();
         }
         try {
             Maintenance created = maintenanceService.createMaintenance(maintenance);
-            return ResponseEntity.ok(created);
+            return ResponseEntity.ok(created.toDto());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -113,10 +113,10 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}/towing/{towingId}")
-    public ResponseEntity<Towing> updateTowing(@PathVariable Long id, @PathVariable Long towingId, @RequestBody TowingUpdateDto dto) {
+    public ResponseEntity<TowingDto> updateTowing(@PathVariable Long id, @PathVariable Long towingId, @RequestBody TowingUpdateDto dto) {
         return towingService.getTowingById(towingId)
                 .filter(t -> t.getVehicle() != null && t.getVehicle().getId().equals(id))
-                .map(existing -> ResponseEntity.ok(towingService.updateTowing(towingId, dto)))
+                .map(existing -> ResponseEntity.ok(towingService.updateTowing(towingId, dto).toDto()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -137,10 +137,10 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}/maintenance/{maintenanceId}")
-    public ResponseEntity<Maintenance> updateMaintenance(@PathVariable Long id, @PathVariable Long maintenanceId, @RequestBody MaintenanceUpdateDto dto) {
+    public ResponseEntity<MaintenanceDto> updateMaintenance(@PathVariable Long id, @PathVariable Long maintenanceId, @RequestBody MaintenanceUpdateDto dto) {
         return maintenanceService.getMaintenanceById(maintenanceId)
                 .filter(m -> m.getVehicle() != null && m.getVehicle().getId().equals(id))
-                .map(existing -> ResponseEntity.ok(maintenanceService.updateMaintenance(maintenanceId, dto)))
+                .map(existing -> ResponseEntity.ok(maintenanceService.updateMaintenance(maintenanceId, dto).toDto()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

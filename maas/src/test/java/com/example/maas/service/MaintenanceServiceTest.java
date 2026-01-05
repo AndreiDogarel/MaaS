@@ -1,6 +1,7 @@
 package com.example.maas.service;
 
 import com.example.maas.entities.Maintenance;
+import com.example.maas.entities.MaintenanceDto;
 import com.example.maas.entities.Vehicle;
 import com.example.maas.repository.MaintenanceRepository;
 import com.example.maas.repository.VehicleRepository;
@@ -59,7 +60,7 @@ public class MaintenanceServiceTest {
     void getMaintenanceHistory_shouldReturnMaintenanceList_forVehicle() {
         when(maintenanceRepository.findByVehicleId(1L)).thenReturn(Arrays.asList(maintenance1, maintenance2));
 
-        List<Maintenance> result = maintenanceService.getMaintenanceHistory(1L);
+        List<MaintenanceDto> result = maintenanceService.getMaintenanceHistory(1L);
 
         assertEquals(2, result.size());
         assertEquals(maintenance1.getId(), result.get(0).getId());

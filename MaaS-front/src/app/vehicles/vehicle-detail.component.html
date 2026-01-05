@@ -239,10 +239,10 @@
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ record.cost |
                     number:'1.2-2' }} €</td>
                   <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500 dark:text-gray-400">
-                    <span *ngIf="record.isInspection" class="text-green-600 dark:text-green-400">✓</span>
-                    <span *ngIf="!record.isInspection" class="text-gray-400">—</span>
+                    <span *ngIf="record.inspection" class="text-green-600 dark:text-green-400">✓</span>
+                    <span *ngIf="!record.inspection" class="text-gray-400">—</span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ record.nextInspection ? (record.nextInspection | date:'mediumDate') : '—' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ record.nextInspectionDate ? (record.nextInspectionDate | date:'mediumDate') : '—' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ record.mileage ? (record.mileage | number) + ' km' : '—' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <ng-container *ngIf="authService.isAdmin$ | async">
@@ -371,15 +371,15 @@
                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
               </div>
               <div class="flex items-center">
-                <input type="checkbox" id="modal-maintenance-isInspection" [(ngModel)]="maintenanceForm.isInspection"
+                <input type="checkbox" id="modal-maintenance-inspection" [(ngModel)]="maintenanceForm.inspection"
                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600">
-                <label for="modal-maintenance-isInspection"
+                <label for="modal-maintenance-inspection"
                   class="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Is this an inspection?</label>
               </div>
               <div>
-                <label for="modal-maintenance-nextInspection"
+                <label for="modal-maintenance-nextInspectionDate"
                   class="block text-sm font-medium text-gray-700 dark:text-gray-300">Next Inspection Date</label>
-                <input type="date" id="modal-maintenance-nextInspection" [(ngModel)]="maintenanceForm.nextInspection"
+                <input type="date" id="modal-maintenance-nextInspectionDate" [(ngModel)]="maintenanceForm.nextInspectionDate"
                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm">
               </div>
             </div>

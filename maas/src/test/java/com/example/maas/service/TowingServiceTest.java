@@ -1,6 +1,7 @@
 package com.example.maas.service;
 
 import com.example.maas.entities.Towing;
+import com.example.maas.entities.TowingDto;
 import com.example.maas.entities.Vehicle;
 import com.example.maas.repository.TowingRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,7 @@ public class TowingServiceTest {
     void getTowingHistory_shouldReturnTowingList_forVehicle() {
         when(towingRepository.findByVehicleId(3L)).thenReturn(Arrays.asList(towing1));
 
-        List<Towing> result = towingService.getTowingHistory(3L);
+        List<TowingDto> result = towingService.getTowingHistory(3L);
 
         assertEquals(1, result.size());
         assertEquals(towing1.getId(), result.get(0).getId());

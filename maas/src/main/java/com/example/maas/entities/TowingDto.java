@@ -8,7 +8,9 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class TowingDto {
+    private Long id;
     private LocalDate date;
     private String location;
     private String reason;
@@ -16,6 +18,7 @@ public class TowingDto {
     private Long vehicleId;
 
     public TowingDto(Towing towing) {
+        this.id = towing.getId();
         this.date = towing.getDate();
         this.location = towing.getLocation();
         this.reason = towing.getReason();

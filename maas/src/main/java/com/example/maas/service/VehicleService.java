@@ -57,7 +57,7 @@ public class VehicleService {
         if (repo.existsByRegistrationNumber(r.registrationNumber())) {
             throw new IllegalArgumentException("registrationNumber already exists");
         }
-        if (r.year() < 1980 || r.year() > 2025) {
+        if (r.year() < 1980 || r.year() > 2026) {
             throw new IllegalArgumentException("year out of range");
         }
 

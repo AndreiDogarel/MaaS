@@ -9,7 +9,9 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class MaintenanceDto { @Column(nullable = false)
+    private Long id;
     private LocalDate date;
     private String type;
     private String description;
@@ -20,6 +22,7 @@ public class MaintenanceDto { @Column(nullable = false)
     private Long mileage;
 
     public MaintenanceDto(Maintenance maintenance) {
+        this.id = maintenance.getId();
         this.date = maintenance.getDate();
         this.type = maintenance.getType();
         this.description = maintenance.getDescription();

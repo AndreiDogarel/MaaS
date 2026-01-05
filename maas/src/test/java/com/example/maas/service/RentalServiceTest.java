@@ -98,6 +98,7 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
+                .endDate(LocalDate.of(2026, 1, 5))
                 .status(RentalStatus.COMPLETED)
                 .build();
 
@@ -116,6 +117,7 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
+                .endDate(LocalDate.of(2026, 1, 5))
                 .status(RentalStatus.COMPLETED)
                 .build();
 
@@ -138,8 +140,10 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
+                .endDate(LocalDate.of(2026, 1, 5))
                 .status(RentalStatus.COMPLETED)
                 .build();
+
 
         assertThrows(AccessDeniedException.class, () -> rentalService.createRental(1L, dto));
         verify(vehicleRepository).findById(1L);
@@ -170,8 +174,10 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
+                .endDate(LocalDate.of(2026, 1, 5))
                 .status(RentalStatus.COMPLETED)
                 .build();
+
 
         assertThrows(AccessDeniedException.class, () -> rentalService.createRental(1L, dto));
         verify(hasValidDocuments).check(99L);
@@ -182,6 +188,8 @@ class RentalServiceTest {
     void createRental_customerWithDocuments_persistsAndReturnsDto() {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(1L);
+        vehicle.setMileage(100L);
+        vehicle.setPricePerDay(50L);
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
 
         Roles customerRole = Roles.builder().name(Role.CUSTOMER).build();
@@ -245,6 +253,9 @@ class RentalServiceTest {
     void createRental_adminBypassesDocumentCheck() {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(1L);
+        vehicle.setMileage(100L);
+        vehicle.setPricePerDay(50L);
+
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
 
         Roles adminRole = Roles.builder().name(Role.ADMIN).build();
@@ -274,8 +285,10 @@ class RentalServiceTest {
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
+                .endDate(LocalDate.of(2026, 1, 5))
                 .status(RentalStatus.COMPLETED)
                 .build();
+
 
         RentalDto out = rentalService.createRental(1L, dto).toRentalDto();
 
@@ -288,6 +301,9 @@ class RentalServiceTest {
     void createRental_principalNotUser_usesFindByUsername() {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(1L);
+        vehicle.setMileage(100L);
+        vehicle.setPricePerDay(50L);
+
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
 
         Roles customerRole = Roles.builder().name(Role.CUSTOMER).build();
@@ -313,16 +329,20 @@ class RentalServiceTest {
                 .vehicle(vehicle)
                 .user(dbUser)
                 .startDate(LocalDate.of(2026, 1, 3))
+                .endDate(LocalDate.of(2026, 1, 5))
                 .status(RentalStatus.COMPLETED)
                 .createdAt(LocalDateTime.of(2026, 1, 3, 0, 0))
                 .build();
+
 
         when(rentalRepository.save(any(Rental.class))).thenReturn(saved);
 
         RentalDto dto = RentalDto.builder()
                 .startDate(LocalDate.of(2026, 1, 3))
+                .endDate(LocalDate.of(2026, 1, 5))
                 .status(RentalStatus.COMPLETED)
                 .build();
+
 
         Rental out = rentalService.createRental(1L, dto);
 

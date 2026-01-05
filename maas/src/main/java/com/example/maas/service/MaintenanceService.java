@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MaintenanceService {
@@ -94,7 +95,7 @@ public class MaintenanceService {
         return true;
     }
 
-    public List<Maintenance> getMaintenanceHistory(Long vehicleId) {
-        return maintenanceRepository.findByVehicleId(vehicleId);
+    public List<MaintenanceDto> getMaintenanceHistory(Long vehicleId) {
+        return maintenanceRepository.findByVehicleId(vehicleId).stream().map(Maintenance::toDto).collect(Collectors.toList());
     }
 }

@@ -69,7 +69,7 @@ class RentalContractServiceTest {
                 .user(client)
                 .startDate(start)
                 .endDate(end)
-                .status("ACTIVE")
+                .status(RentalStatus.ACTIVE)
                 .createdAt(LocalDateTime.now())
                 .build();
 

@@ -36,4 +36,17 @@ public class Maintenance {
 
     @Column
     private Long mileage;
+
+    public MaintenanceDto toDto() {
+        return MaintenanceDto.builder()
+                .id(this.id)
+                .date(this.date)
+                .type(this.type)
+                .description(this.description)
+                .cost(this.cost)
+                .inspection(this.inspection)
+                .nextInspectionDate(this.nextInspectionDate)
+                .mileage(this.mileage)
+                .build();
+    }
 }

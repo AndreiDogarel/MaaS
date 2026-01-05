@@ -27,4 +27,14 @@ public class Towing {
 
     @Column(nullable = false)
     private Integer duration;
+
+    public TowingDto toDto() {
+        return TowingDto.builder()
+                .id(this.id)
+                .date(this.date)
+                .location(this.location)
+                .reason(this.reason)
+                .duration(this.duration)
+                .build();
+    }
 }
